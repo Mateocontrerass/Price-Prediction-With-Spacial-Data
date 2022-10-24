@@ -93,7 +93,8 @@ carreteras2 = osm_sf2$osm_lines %>% select(osm_id,name)
 carreteras2
 
 
-
-
 prueba<-st_union(x=carreteras,y=carreteras2)
+
+dibujo <- prueba %>% select(osm_id,name,geometry)
+leaflet() %>% addTiles() %>% addPolylines(data=dibujo , col="red")
 
