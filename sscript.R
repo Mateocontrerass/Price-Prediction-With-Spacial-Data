@@ -145,26 +145,139 @@ prueba_bog$dist_via <- mat_dis_min_vias
 
 # Bares
 
+tic()
 osm_b = opq(bbox = getbb("Bogota Colombia")) %>%
   add_osm_feature(key="amenity" , value="bar") 
 
 osm_sf_b = osm_b %>% osmdata_sf()
-bares = osm_sf_b$osm_points %>% select(osm_id,name) 
+bares = osm_sf_b$osm_points %>% select(osm_id) 
+st_crs(bares)
 
-
-leaflet() %>% addTiles() %>% addCircles(data=bares , col="purple")
 
 matriz_distancia<-st_distance(x=prueba_bog,y=bares)
 min_matriz <- apply(matriz_distancia , 1 , min)
-prueba_bog$bar <- min_matriz
-
+prueba_bog$bar2 <- min_matriz
+toc()
 
 #------------------------------------------------------------------------------
  
-# Yo no voy a hacer esta vga 25 veces voy a hacer un loop para iterar 1. sobre los features y despues sobre los key.
+### Este si
+
+amenity<- c("cafe","pub","restaurant","college","library","school","university","fuel","atm","bank",
+              "clinic","hospital","pharmacy","cinema","gambling","nightclub","courthouse","police","townhall","bus_station")
+
+building<-c("cathedral","church","stadium")
+
+landuse<-c("commercial","education","industrial","residential")
+
+leisure<- c("fitness_centre","park","playground")
+
+shop <- c("alcohol","bakery","coffee","mall","supermarket","jewelry","cosmetics","car")
+
+
+tourism <- c("hotel")
+
+features <- c("amenity","building","landuse","leisure","shop","tourism")
+
+for (i in features){
+
+    if (i =="amenity"){
+      for (j in amenity){
+        
+        osm = opq(bbox = getbb("Bogota Colombia")) %>%
+          add_osm_feature(key=i , value=j) 
+        
+        osm_sf = osm %>% osmdata_sf()
+        generico_j = osm_sf$osm_points %>% select(osm_id) 
+        
+        
+        matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+        dist_ <- apply(matriz_distancia , 1 , min)
+        prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+        colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",z)
+        
+        
+      }
+      
+      
+      }
+    else if (i == "building"){
+      print(building)
+    }
+    else if ( i== "landuse"){
+      print(suelo)
+      
+    }
+    else if (i=="leisure"){
+      print(leisure)
+      
+    }
+    else if (i=="shop"){
+      print(shops)
+      
+    }
+    else if (i=="nature"){
+      print(nature)
+      
+    }
+    else if (i=="tourism"){
+      print(tourism)
+      
+    }
+}
 
 
 
+#--------------------
 
 
-                                          
+############## Este nooo
+
+
+amenity <- c("cafe","pub")
+#nature <- c("tree")
+
+keys <- c("amenity","nature")
+
+for (i in keys){
+  
+  if (i == "amenity"){
+    for (z in amenity){
+      
+      osm = opq(bbox = getbb("Bogota Colombia")) %>%
+        add_osm_feature(key=i , value=z) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
+      
+      
+      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",z)
+      
+    }
+  }
+  else if (i =="nature"){
+    for (z in nature){
+      
+      osm = opq(bbox = getbb("Bogota Colombia")) %>%
+        add_osm_feature(key=i , value=z) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
+      
+      
+      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",z)
+    
+  }
+  
+}
+}
+                         
+
+
+    
