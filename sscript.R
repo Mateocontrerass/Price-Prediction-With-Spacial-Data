@@ -62,6 +62,9 @@ test <- st_as_sf(x = p1_test, ## datos
                    crs=4326) ## CRS
 
 
+
+
+
 #------------------------------------------------------------------------------
 #Carreteras principales ( falta subrayar la autonorte, la NQS y la 80)
 
@@ -519,7 +522,7 @@ write.csv(x = prueba_bog, file = "Base_bogota_amenities.csv", sep = ",",
           row.names = FALSE, col.names = TRUE)
 
 
-#--------------------
+
 
 #------------------------------------------------------------------------------
 #Regex
@@ -532,14 +535,19 @@ train$description<- str_to_lower(string=train$description)
 
 #Reemplazo la puntuación con espacios
 
-
 train$description <- gsub(","," ", train$description)
+
 
 #Mala escriura de baño (bao / bano)
 
 train$description <- gsub("bao","baño", train$description)
 train$description <- gsub("bano","baño", train$description)
 
+
+#Dropear columna operation_type y operation_id (no dice nada)
+
+train <- subset(train, select=-c(operation_type,property_id,rooms))
+test <- subset(test, select=-c(operation_type,property_id,rooms))
 
 
   #Baño
@@ -556,17 +564,38 @@ train$nuevos_baños <- str_extract(string=train$description, pattern = x)
 
 train$nuevos_baños <- gsub("baños","",train$nuevos_baños)
     
-    as.numeric(train$nuevos_baños)
-
-unique(train$nuevos_baños)
 
 
+train$nuevos_baños <- gsub("tres","3",train$nuevos_baños)
+train$nuevos_baños <- gsub("cinco","5",train$nuevos_baños)
+train$nuevos_baños <- gsub("dos","2",train$nuevos_baños)
+train$nuevos_baños <- gsub("doss","2",train$nuevos_baños)
+train$nuevos_baños <- gsub("cuatro","4",train$nuevos_baños)
+train$nuevos_baños <- gsub("cuastro","4",train$nuevos_baños)
+train$nuevos_baños <- gsub("seis","6",train$nuevos_baños)
+train$nuevos_baños <- gsub("doas","2",train$nuevos_baños)
+train$nuevos_baños <- gsub("balcn4","4",train$nuevos_baños)
+train$nuevos_baños <- gsub("comerdor2","2",train$nuevos_baños)
+train$nuevos_baños <- gsub("habitaciones4","4",train$nuevos_baños)
+train$nuevos_baños <- gsub("federman2","2",train$nuevos_baños)
+train$nuevos_baños <- gsub("integral3","3",train$nuevos_baños)
+train$nuevos_baños <- gsub("servicio3","3",train$nuevos_baños)
+train$nuevos_baños <- gsub("alcobas3","3",train$nuevos_baños)
+
+
+train$nuevos_baños[is.na(train$nuevos_baños)] = 0
+train$nuevos_baños <- str_trim(train$nuevos_baños,side = c("both"))
 
 
 
 
 
-#--------------------
+#------------------------------------------------------------------------------
+#
+
+
+
+#------------------------------------------------------------------------------
 
 
 # 
@@ -631,11 +660,4 @@ unique(train$nuevos_baños)
 #     
 
 
-zapato <- c("cucuta","bucarayork")
-
-
-for (i in zapato){
-  
-  print(paste(i,"colombia", sep=" "))
-}
 
