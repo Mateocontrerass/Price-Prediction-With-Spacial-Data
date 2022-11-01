@@ -353,6 +353,13 @@ for (u in ciudades){
 }
 toc()
 
+
+write.csv(x = prueba_bog, file = "Base_bogota_amenities.csv", sep = ",",
+          row.names = FALSE, col.names = TRUE)
+
+df <- read.csv("Base_bogota_amenities.csv", header = TRUE, sep = ",")
+
+
 #------------------------------------------------------------------------------
 #Pa cali
 
@@ -515,12 +522,6 @@ for (i in features){
     
   }
 }
-
-
-
-write.csv(x = prueba_bog, file = "Base_bogota_amenities.csv", sep = ",",
-          row.names = FALSE, col.names = TRUE)
-
 
 
 
