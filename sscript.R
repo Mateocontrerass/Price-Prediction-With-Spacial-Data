@@ -345,14 +345,11 @@ for (i in features){
 
 toc()
 
-<<<<<<< Updated upstream
-=======
 write.csv(x = prueba_bog, file = "Base_bogota_amenities.csv", sep = ",",
           row.names = FALSE, col.names = TRUE)
 
 
 #--------------------
->>>>>>> Stashed changes
 
 #------------------------------------------------------------------------------
 #Regex
