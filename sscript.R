@@ -177,173 +177,343 @@ shop <- c("alcohol","bakery","coffee","mall","supermarket","jewelry","cosmetics"
 
 tourism <- c("hotel")
 
-#features <- c("amenity","building","landuse","leisure","shop","tourism")
+features <- c("amenity","building","landuse","leisure","shop","tourism")
 
-features <- c("building","landuse","leisure","shop","tourism")
+#features <- c("building","landuse","leisure","shop","tourism")
 
+ciudades <- c("bogota","medellin")
 
 tic()
+
+for (u in ciudades){
+
+  for (i in features){
+  
+      if (i =="amenity"){
+        for (j in amenity){
+          
+          osm = opq(bbox = getbb(paste(u,"colombia",sep=" "))) %>%
+            add_osm_feature(key=i , value=j) 
+          
+          osm_sf = osm %>% osmdata_sf()
+          generico_j = osm_sf$osm_points %>% select(osm_id) 
+          
+          
+          matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+          dist_ <- apply(matriz_distancia , 1 , min)
+          prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+          colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+          
+          avance <- paste0("Terminada feature ", j, ".")
+          print(avance)
+          
+        }
+        
+        
+        }
+      else if (i == "building"){
+        for (j in building){
+          
+          osm = opq(bbox = getbb(paste(u,"colombia",sep=" "))) %>%
+            add_osm_feature(key=i , value=j) 
+          
+          osm_sf = osm %>% osmdata_sf()
+          generico_j = osm_sf$osm_points %>% select(osm_id) 
+          
+          
+          matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+          dist_ <- apply(matriz_distancia , 1 , min)
+          prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+          colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+          
+          avance <- paste0("Terminada feature ", j, ".")
+          print(avance)
+          
+        }
+        
+        
+            }
+      else if ( i== "landuse"){
+        for (j in landuse){
+          
+          osm = opq(bbox = getbb(paste(u,"colombia",sep=" "))) %>%
+            add_osm_feature(key=i , value=j) 
+          
+          osm_sf = osm %>% osmdata_sf()
+          generico_j = osm_sf$osm_points %>% select(osm_id) 
+          
+          
+          matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+          dist_ <- apply(matriz_distancia , 1 , min)
+          prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+          colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+          
+          avance <- paste0("Terminada feature ", j, ".")
+          print(avance)
+          
+        }      
+      }
+      else if (i=="leisure"){
+  
+        for (j in leisure){
+          
+          osm = opq(bbox = getbb(paste(u,"colombia",sep=" "))) %>%
+            add_osm_feature(key=i , value=j) 
+          
+          osm_sf = osm %>% osmdata_sf()
+          generico_j = osm_sf$osm_points %>% select(osm_id) 
+          
+          
+          matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+          dist_ <- apply(matriz_distancia , 1 , min)
+          prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+          colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+          
+          avance <- paste0("Terminada feature ", j, ".")
+          print(avance)
+          
+        }
+        
+        
+      }
+      else if (i=="shop"){
+  
+        for (j in shop){
+          
+          osm = opq(bbox = getbb(paste(u,"colombia",sep=" "))) %>%
+            add_osm_feature(key=i , value=j) 
+          
+          osm_sf = osm %>% osmdata_sf()
+          generico_j = osm_sf$osm_points %>% select(osm_id) 
+          
+          
+          matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+          dist_ <- apply(matriz_distancia , 1 , min)
+          prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+          colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+          
+          avance <- paste0("Terminada feature ", j, ".")
+          print(avance)
+          
+        }
+        
+        
+      }
+      else if (i=="nature"){
+  
+        for (j in nature){
+          
+          osm = opq(bbox = getbb(paste(u,"colombia",sep=" "))) %>%
+            add_osm_feature(key=i , value=j) 
+          
+          osm_sf = osm %>% osmdata_sf()
+          generico_j = osm_sf$osm_points %>% select(osm_id) 
+          
+          
+          matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+          dist_ <- apply(matriz_distancia , 1 , min)
+          prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+          colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+          
+          avance <- paste0("Terminada feature ", j, ".")
+          print(avance)
+          
+        }
+        
+        
+      }
+      else if (i=="tourism"){
+  
+        for (j in tourism){
+          
+          osm = opq(bbox = getbb(paste(u,"colombia",sep=" "))) %>%
+            add_osm_feature(key=i , value=j) 
+          
+          osm_sf = osm %>% osmdata_sf()
+          generico_j = osm_sf$osm_points %>% select(osm_id) 
+          
+          
+          matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+          dist_ <- apply(matriz_distancia , 1 , min)
+          prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+          colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+          
+          avance <- paste0("Terminada feature ", j, ".")
+          print(avance)
+          
+        }
+        
+        
+      }
+  }
+
+}
+toc()
+
+#------------------------------------------------------------------------------
+#Pa cali
+
 for (i in features){
-
-    if (i =="amenity"){
-      for (j in amenity){
-        
-        osm = opq(bbox = getbb("Bogota Colombia")) %>%
-          add_osm_feature(key=i , value=j) 
-        
-        osm_sf = osm %>% osmdata_sf()
-        generico_j = osm_sf$osm_points %>% select(osm_id) 
-        
-        
-        matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
-        dist_ <- apply(matriz_distancia , 1 , min)
-        prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-        colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
-        
-        avance <- paste0("Terminada feature ", j, ".")
-        print(avance)
-        
-      }
+  
+  if (i =="amenity"){
+    for (j in amenity){
+      
+      osm = opq(bbox = getbb("cali colombia")) %>%
+        add_osm_feature(key=i , value=j) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
       
       
-      }
-    else if (i == "building"){
-      for (j in building){
-        
-        osm = opq(bbox = getbb("Bogota Colombia")) %>%
-          add_osm_feature(key=i , value=j) 
-        
-        osm_sf = osm %>% osmdata_sf()
-        generico_j = osm_sf$osm_points %>% select(osm_id) 
-        
-        
-        matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
-        dist_ <- apply(matriz_distancia , 1 , min)
-        prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-        colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
-        
-        avance <- paste0("Terminada feature ", j, ".")
-        print(avance)
-        
-      }
+      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
       
-      
-          }
-    else if ( i== "landuse"){
-      for (j in landuse){
-        
-        osm = opq(bbox = getbb("Bogota Colombia")) %>%
-          add_osm_feature(key=i , value=j) 
-        
-        osm_sf = osm %>% osmdata_sf()
-        generico_j = osm_sf$osm_points %>% select(osm_id) 
-        
-        
-        matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
-        dist_ <- apply(matriz_distancia , 1 , min)
-        prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-        colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
-        
-        avance <- paste0("Terminada feature ", j, ".")
-        print(avance)
-        
-      }      
-    }
-    else if (i=="leisure"){
-
-      for (j in leisure){
-        
-        osm = opq(bbox = getbb("Bogota Colombia")) %>%
-          add_osm_feature(key=i , value=j) 
-        
-        osm_sf = osm %>% osmdata_sf()
-        generico_j = osm_sf$osm_points %>% select(osm_id) 
-        
-        
-        matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
-        dist_ <- apply(matriz_distancia , 1 , min)
-        prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-        colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
-        
-        avance <- paste0("Terminada feature ", j, ".")
-        print(avance)
-        
-      }
-      
+      avance <- paste0("Terminada feature ", j, ".")
+      print(avance)
       
     }
-    else if (i=="shop"){
-
-      for (j in shop){
-        
-        osm = opq(bbox = getbb("Bogota Colombia")) %>%
-          add_osm_feature(key=i , value=j) 
-        
-        osm_sf = osm %>% osmdata_sf()
-        generico_j = osm_sf$osm_points %>% select(osm_id) 
-        
-        
-        matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
-        dist_ <- apply(matriz_distancia , 1 , min)
-        prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-        colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
-        
-        avance <- paste0("Terminada feature ", j, ".")
-        print(avance)
-        
-      }
+    
+    
+  }
+  else if (i == "building"){
+    for (j in building){
+      
+      osm = opq(bbox = getbb("cali colombia")) %>%
+        add_osm_feature(key=i , value=j) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
       
       
-    }
-    else if (i=="nature"){
-
-      for (j in nature){
-        
-        osm = opq(bbox = getbb("Bogota Colombia")) %>%
-          add_osm_feature(key=i , value=j) 
-        
-        osm_sf = osm %>% osmdata_sf()
-        generico_j = osm_sf$osm_points %>% select(osm_id) 
-        
-        
-        matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
-        dist_ <- apply(matriz_distancia , 1 , min)
-        prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-        colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
-        
-        avance <- paste0("Terminada feature ", j, ".")
-        print(avance)
-        
-      }
+      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
       
+      avance <- paste0("Terminada feature ", j, ".")
+      print(avance)
       
     }
-    else if (i=="tourism"){
-
-      for (j in tourism){
-        
-        osm = opq(bbox = getbb("Bogota Colombia")) %>%
-          add_osm_feature(key=i , value=j) 
-        
-        osm_sf = osm %>% osmdata_sf()
-        generico_j = osm_sf$osm_points %>% select(osm_id) 
-        
-        
-        matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
-        dist_ <- apply(matriz_distancia , 1 , min)
-        prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-        colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
-        
-        avance <- paste0("Terminada feature ", j, ".")
-        print(avance)
-        
-      }
+    
+    
+  }
+  else if ( i== "landuse"){
+    for (j in landuse){
       
+      osm = opq(bbox = getbb("cali colombia")) %>%
+        add_osm_feature(key=i , value=j) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
+      
+      
+      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+      
+      avance <- paste0("Terminada feature ", j, ".")
+      print(avance)
+      
+    }      
+  }
+  else if (i=="leisure"){
+    
+    for (j in leisure){
+      
+      osm = opq(bbox = getbb("cali colombia")) %>%
+        add_osm_feature(key=i , value=j) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
+      
+      
+      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+      
+      avance <- paste0("Terminada feature ", j, ".")
+      print(avance)
       
     }
+    
+    
+  }
+  else if (i=="shop"){
+    
+    for (j in shop){
+      
+      osm = opq(bbox = getbb("cali colombia")) %>%
+        add_osm_feature(key=i , value=j) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
+      
+      
+      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+      
+      avance <- paste0("Terminada feature ", j, ".")
+      print(avance)
+      
+    }
+    
+    
+  }
+  else if (i=="nature"){
+    
+    for (j in nature){
+      
+      osm = opq(bbox = getbb("cali colombia")) %>%
+        add_osm_feature(key=i , value=j) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
+      
+      
+      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+      
+      avance <- paste0("Terminada feature ", j, ".")
+      print(avance)
+      
+    }
+    
+    
+  }
+  else if (i=="tourism"){
+    
+    for (j in tourism){
+      
+      osm = opq(bbox = getbb("cali colombia")) %>%
+        add_osm_feature(key=i , value=j) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
+      
+      
+      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+      
+      avance <- paste0("Terminada feature ", j, ".")
+      print(avance)
+      
+    }
+    
+    
+  }
 }
 
-toc()
+
 
 write.csv(x = prueba_bog, file = "Base_bogota_amenities.csv", sep = ",",
           row.names = FALSE, col.names = TRUE)
@@ -455,6 +625,17 @@ unique(train$nuevos_baños)
 #   
 # }
 #       
+
 # 
 # 
 #     
+
+
+zapato <- c("cucuta","bucarayork")
+
+
+for (i in zapato){
+  
+  print(paste(i,"colombia", sep=" "))
+}
+
