@@ -345,63 +345,111 @@ for (i in features){
 
 toc()
 
+
+#------------------------------------------------------------------------------
+#Regex
+
+
+#Pasar todo a minuscula
+
+test$description<- str_to_lower(string=test$description)
+train$description<- str_to_lower(string=train$description)
+
+#Reemplazo la puntuación con espacios
+
+
+train$description <- gsub(","," ", train$description)
+
+#Mala escriura de baño (bao / bano)
+
+train$description <- gsub("bao","baño", train$description)
+train$description <- gsub("bano","baño", train$description)
+
+
+
+  #Baño
+
+#Este me cuenta cada vez que haya una palabra de baño solita
+train$nuevos_baño <- str_count(string=train$description , pattern = "baño[:blank:]" )  
+
+#Cuando la palabra es bañoS, este me agarra la palabra que estaba antes
+
+x <- "[:alnum:]+[:blank:]+baños"
+
+train$nuevos_baños <- str_extract(string=train$description, pattern = x) 
+
+
+train$nuevos_baños <- gsub("baños","",train$nuevos_baños)
+    
+    as.numeric(train$nuevos_baños)
+
+unique(train$nuevos_baños)
+
+
+
+
+
+
+
 #--------------------
 
 
-############## Este nooo
-
-
-amenity <- c("cafe","pub")
-#nature <- c("tree")
-
-keys <- c("amenity","nature")
-
-for (i in keys){
-  
-  if (i == "amenity"){
-    for (z in amenity){
-      
-      osm = opq(bbox = getbb("Bogota Colombia")) %>%
-        add_osm_feature(key=i , value=z) 
-      
-      osm_sf = osm %>% osmdata_sf()
-      generico_j = osm_sf$osm_points %>% select(osm_id) 
-      
-      
-      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
-      dist_ <- apply(matriz_distancia , 1 , min)
-      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",z)
-      
-    }
-  }
-  else if (i =="nature"){
-    for (z in nature){
-      
-      osm = opq(bbox = getbb("Bogota Colombia")) %>%
-        add_osm_feature(key=i , value=z) 
-      
-      osm_sf = osm %>% osmdata_sf()
-      generico_j = osm_sf$osm_points %>% select(osm_id) 
-      
-      
-      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
-      dist_ <- apply(matriz_distancia , 1 , min)
-      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",z)
-    
-  }
-  
-}
-}
-                 
-
-sapoperro <- c("hey","hola")  
-for (i in sapoperro){
-  print(i)
-  
-}
-      
-
-
-    
+# 
+# 
+# ############## Este nooo
+# 
+# 
+# amenity <- c("cafe","pub")
+# #nature <- c("tree")
+# 
+# keys <- c("amenity","nature")
+# 
+# for (i in keys){
+#   
+#   if (i == "amenity"){
+#     for (z in amenity){
+#       
+#       osm = opq(bbox = getbb("Bogota Colombia")) %>%
+#         add_osm_feature(key=i , value=z) 
+#       
+#       osm_sf = osm %>% osmdata_sf()
+#       generico_j = osm_sf$osm_points %>% select(osm_id) 
+#       
+#       
+#       matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+#       dist_ <- apply(matriz_distancia , 1 , min)
+#       prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+#       colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",z)
+#       
+#     }
+#   }
+#   else if (i =="nature"){
+#     for (z in nature){
+#       
+#       osm = opq(bbox = getbb("Bogota Colombia")) %>%
+#         add_osm_feature(key=i , value=z) 
+#       
+#       osm_sf = osm %>% osmdata_sf()
+#       generico_j = osm_sf$osm_points %>% select(osm_id) 
+#       
+#       
+#       matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+#       dist_ <- apply(matriz_distancia , 1 , min)
+#       prueba_bog[,ncol(prueba_bog) + 1]<-dist_
+#       colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",z)
+#     
+#   }
+#   
+# }
+# }
+#                  
+# 
+# sapoperro <- c("hey","hola")  
+# for (i in sapoperro){
+#   print(i)
+#   
+# }
+#       
+# 
+# 
+#     
