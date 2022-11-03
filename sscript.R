@@ -367,6 +367,7 @@ write.csv(x = prueba_bog, file = "prueba1.csv", sep = ",",
 
 df <- read.csv("prueba1.csv", header = TRUE, sep = ",")
 
+skim(df)
 
 #------------------------------------------------------------------------------
 #Pa cali
@@ -537,6 +538,35 @@ for (i in features){
 #Regex
 
 
+p1_test <- test
+p1_train <- train
+
+skim(train)
+head(train$surface_total, n = 16L)
+
+# Reducir a minuscula
+train$description<- str_to_lower(string=test$description)
+
+# Quitar caracteres inncesarios
+
+train$description <- gsub("\n", " ", train$description)
+
+### Remodelada
+
+train$description <- gsub("nuevo", "remodelada", train$description)
+train$description <- gsub("nueva", "remodelada", train$description)
+train$description <- gsub("remodelado", "remodelada", train$description)
+train$description <- gsub("estrenar", "remodelada", train$description)
+
+train$remodelada <- str_count(string=train$description , pattern = "remodelada[:blank:]" )  
+
+skim(train$remodelada)
+
+train$remodelada
+
+
+
+### Regex baño
 
 #Pasar todo a minuscula
 
