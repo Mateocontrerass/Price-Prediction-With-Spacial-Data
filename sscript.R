@@ -186,6 +186,14 @@ features <- c("amenity","building","landuse","leisure","shop","tourism")
 
 ciudades <- c("bogota","medellin")
 
+medellin<- subset(train, city=="Medellín") 
+bogota<- subset(train, city=="Bogotá D.C") 
+
+
+
+
+
+
 tic()
 
 for (u in ciudades){
@@ -202,10 +210,10 @@ for (u in ciudades){
           generico_j = osm_sf$osm_points %>% select(osm_id) 
           
           
-          matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+          matriz_distancia<-st_distance(x=train,y=generico_j)
           dist_ <- apply(matriz_distancia , 1 , min)
-          prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-          colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+          train[,ncol(train) + 1]<-dist_
+          colnames(train)[ncol(train)]<-paste0("dist_",j,u)
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
@@ -224,10 +232,10 @@ for (u in ciudades){
           generico_j = osm_sf$osm_points %>% select(osm_id) 
           
           
-          matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+          matriz_distancia<-st_distance(x=train,y=generico_j)
           dist_ <- apply(matriz_distancia , 1 , min)
-          prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-          colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+          train[,ncol(train) + 1]<-dist_
+          colnames(train)[ncol(train)]<-paste0("dist_",j,u)
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
@@ -246,10 +254,10 @@ for (u in ciudades){
           generico_j = osm_sf$osm_points %>% select(osm_id) 
           
           
-          matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+          matriz_distancia<-st_distance(x=train,y=generico_j)
           dist_ <- apply(matriz_distancia , 1 , min)
-          prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-          colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+          train[,ncol(train) + 1]<-dist_
+          colnames(train)[ncol(train)]<-paste0("dist_",j,u)
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
@@ -267,10 +275,10 @@ for (u in ciudades){
           generico_j = osm_sf$osm_points %>% select(osm_id) 
           
           
-          matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+          matriz_distancia<-st_distance(x=train,y=generico_j)
           dist_ <- apply(matriz_distancia , 1 , min)
-          prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-          colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+          train[,ncol(train) + 1]<-dist_
+          colnames(train)[ncol(train)]<-paste0("dist_",j,u)
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
@@ -290,10 +298,10 @@ for (u in ciudades){
           generico_j = osm_sf$osm_points %>% select(osm_id) 
           
           
-          matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+          matriz_distancia<-st_distance(x=train,y=generico_j)
           dist_ <- apply(matriz_distancia , 1 , min)
-          prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-          colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+          train[,ncol(train) + 1]<-dist_
+          colnames(train)[ncol(train)]<-paste0("dist_",j,u)
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
@@ -313,10 +321,10 @@ for (u in ciudades){
           generico_j = osm_sf$osm_points %>% select(osm_id) 
           
           
-          matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+          matriz_distancia<-st_distance(x=train,y=generico_j)
           dist_ <- apply(matriz_distancia , 1 , min)
-          prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-          colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+          train[,ncol(train) + 1]<-dist_
+          colnames(train)[ncol(train)]<-paste0("dist_",j,u)
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
@@ -336,10 +344,10 @@ for (u in ciudades){
           generico_j = osm_sf$osm_points %>% select(osm_id) 
           
           
-          matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+          matriz_distancia<-st_distance(x=train,y=generico_j)
           dist_ <- apply(matriz_distancia , 1 , min)
-          prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-          colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+          train[,ncol(train) + 1]<-dist_
+          colnames(train)[ncol(train)]<-paste0("dist_",j,u)
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
@@ -354,10 +362,10 @@ for (u in ciudades){
 toc()
 
 
-write.csv(x = prueba_bog, file = "Base_bogota_amenities.csv", sep = ",",
+write.csv(x = prueba_bog, file = "prueba1.csv", sep = ",",
           row.names = FALSE, col.names = TRUE)
 
-df <- read.csv("Base_bogota_amenities.csv", header = TRUE, sep = ",")
+df <- read.csv("prueba1.csv", header = TRUE, sep = ",")
 
 skim(df)
 
@@ -376,10 +384,10 @@ for (i in features){
       generico_j = osm_sf$osm_points %>% select(osm_id) 
       
       
-      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      matriz_distancia<-st_distance(x=test,y=generico_j)
       dist_ <- apply(matriz_distancia , 1 , min)
-      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+      test[,ncol(test) + 1]<-dist_
+      colnames(test)[ncol(test)]<-paste0("dist_",j)
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
@@ -398,10 +406,10 @@ for (i in features){
       generico_j = osm_sf$osm_points %>% select(osm_id) 
       
       
-      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      matriz_distancia<-st_distance(x=test,y=generico_j)
       dist_ <- apply(matriz_distancia , 1 , min)
-      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+      test[,ncol(test) + 1]<-dist_
+      colnames(test)[ncol(test)]<-paste0("dist_",j)
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
@@ -420,10 +428,10 @@ for (i in features){
       generico_j = osm_sf$osm_points %>% select(osm_id) 
       
       
-      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      matriz_distancia<-st_distance(x=test,y=generico_j)
       dist_ <- apply(matriz_distancia , 1 , min)
-      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+      test[,ncol(test) + 1]<-dist_
+      colnames(test)[ncol(test)]<-paste0("dist_",j)
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
@@ -441,10 +449,10 @@ for (i in features){
       generico_j = osm_sf$osm_points %>% select(osm_id) 
       
       
-      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      matriz_distancia<-st_distance(x=test,y=generico_j)
       dist_ <- apply(matriz_distancia , 1 , min)
-      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+      test[,ncol(test) + 1]<-dist_
+      colnames(test)[ncol(test)]<-paste0("dist_",j)
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
@@ -464,10 +472,10 @@ for (i in features){
       generico_j = osm_sf$osm_points %>% select(osm_id) 
       
       
-      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      matriz_distancia<-st_distance(x=test,y=generico_j)
       dist_ <- apply(matriz_distancia , 1 , min)
-      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+      test[,ncol(test) + 1]<-dist_
+      colnames(test)[ncol(test)]<-paste0("dist_",j)
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
@@ -487,10 +495,10 @@ for (i in features){
       generico_j = osm_sf$osm_points %>% select(osm_id) 
       
       
-      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      matriz_distancia<-st_distance(x=test,y=generico_j)
       dist_ <- apply(matriz_distancia , 1 , min)
-      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+      test[,ncol(test) + 1]<-dist_
+      colnames(test)[ncol(test)]<-paste0("dist_",j)
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
@@ -510,10 +518,10 @@ for (i in features){
       generico_j = osm_sf$osm_points %>% select(osm_id) 
       
       
-      matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
+      matriz_distancia<-st_distance(x=test,y=generico_j)
       dist_ <- apply(matriz_distancia , 1 , min)
-      prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-      colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",j)
+      test[,ncol(test) + 1]<-dist_
+      colnames(test)[ncol(test)]<-paste0("dist_",j)
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
@@ -587,6 +595,7 @@ test <- subset(test, select=-c(operation_type,property_id,rooms))
 #Este me cuenta cada vez que haya una palabra de baño solita
 train$nuevos_baño <- str_count(string=train$description , pattern = "baño[:blank:]" )  
 
+
 #Cuando la palabra es bañoS, este me agarra la palabra que estaba antes
 
 x <- "[:alnum:]+[:blank:]+baños"
@@ -615,81 +624,29 @@ train$nuevos_baños <- gsub("servicio3","3",train$nuevos_baños)
 train$nuevos_baños <- gsub("alcobas3","3",train$nuevos_baños)
 
 
+train$nuevos_baños<-str_extract(train$nuevos_baños,pattern="[:digit:]")
 train$nuevos_baños[is.na(train$nuevos_baños)] = 0
 train$nuevos_baños <- str_trim(train$nuevos_baños,side = c("both"))
 
+train$nuevos_baños <- as.numeric(train$nuevos_baños)
 
+# Este bloque sirve para imputar cuando bathrooms está vacio con nuevos baños
+# La segunda linea pone NA si la imputacion pone un 0
+train %>% mutate(bathrooms=coalesce(bathrooms,nuevos_baños))
+train %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
+
+# Esto hace lo mismo que arriba, pero si nuevos_Baños no sirve usa nuevos_baño
+train %>% mutate(bathrooms=coalesce(bathrooms,nuevos_baño))
+train %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
+
+
+# Si nada de esto sirve se procede con la imputación del XGBoost
 
 
 
 #------------------------------------------------------------------------------
-#
 
 
-
-#------------------------------------------------------------------------------
-
-
-# 
-# 
-# ############## Este nooo
-# 
-# 
-# amenity <- c("cafe","pub")
-# #nature <- c("tree")
-# 
-# keys <- c("amenity","nature")
-# 
-# for (i in keys){
-#   
-#   if (i == "amenity"){
-#     for (z in amenity){
-#       
-#       osm = opq(bbox = getbb("Bogota Colombia")) %>%
-#         add_osm_feature(key=i , value=z) 
-#       
-#       osm_sf = osm %>% osmdata_sf()
-#       generico_j = osm_sf$osm_points %>% select(osm_id) 
-#       
-#       
-#       matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
-#       dist_ <- apply(matriz_distancia , 1 , min)
-#       prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-#       colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",z)
-#       
-#     }
-#   }
-#   else if (i =="nature"){
-#     for (z in nature){
-#       
-#       osm = opq(bbox = getbb("Bogota Colombia")) %>%
-#         add_osm_feature(key=i , value=z) 
-#       
-#       osm_sf = osm %>% osmdata_sf()
-#       generico_j = osm_sf$osm_points %>% select(osm_id) 
-#       
-#       
-#       matriz_distancia<-st_distance(x=prueba_bog,y=generico_j)
-#       dist_ <- apply(matriz_distancia , 1 , min)
-#       prueba_bog[,ncol(prueba_bog) + 1]<-dist_
-#       colnames(prueba_bog)[ncol(prueba_bog)]<-paste0("dist_",z)
-#     
-#   }
-#   
-# }
-# }
-#                  
-# 
-# sapoperro <- c("hey","hola")  
-# for (i in sapoperro){
-#   print(i)
-#   
-# }
-#       
-
-# 
-# 
-#     
 
 
 
