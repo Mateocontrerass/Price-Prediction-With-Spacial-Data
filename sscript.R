@@ -537,10 +537,18 @@ for (i in features){
 #Regex
 
 
+
 #Pasar todo a minuscula
 
 test$description<- str_to_lower(string=test$description)
 train$description<- str_to_lower(string=train$description)
+
+
+#Dropear columna operation_type y operation_id (no dice nada)
+
+train <- subset(train, select=-c(operation_type,property_id,rooms))
+test <- subset(test, select=-c(operation_type,property_id,rooms))
+
 
 #Reemplazo la puntuación con espacios
 
@@ -552,11 +560,6 @@ train$description <- gsub(","," ", train$description)
 train$description <- gsub("bao","baño", train$description)
 train$description <- gsub("bano","baño", train$description)
 
-
-#Dropear columna operation_type y operation_id (no dice nada)
-
-train <- subset(train, select=-c(operation_type,property_id,rooms))
-test <- subset(test, select=-c(operation_type,property_id,rooms))
 
 
   #Baño
@@ -607,13 +610,104 @@ train %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
 # Esto hace lo mismo que arriba, pero si nuevos_Baños no sirve usa nuevos_baño
 train %>% mutate(bathrooms=coalesce(bathrooms,nuevos_baño))
 train %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
+#------------------------------------------------------------------------------
+
+# Baños pa test
 
 
-# Si nada de esto sirve se procede con la imputación del XGBoost
+#Reemplazo la puntuación con espacios
+
+test$description <- gsub(","," ", test$description)
+
+
+#Mala escriura de baño (bao / bano)
+
+test$description <- gsub("bao","baño", test$description)
+test$description <- gsub("bano","baño", test$description)
+
+
+
+#Baño
+
+#Este me cuenta cada vez que haya una palabra de baño solita
+test$nuevos_baño <- str_count(string=test$description , pattern = "baño[:blank:]" )  
+
+
+#Cuando la palabra es bañoS, este me agarra la palabra que estaba antes
+
+x <- "[:alnum:]+[:blank:]+baños"
+
+test$nuevos_baños <- str_extract(string=test$description, pattern = x) 
+
+
+test$nuevos_baños <- gsub("baños","",test$nuevos_baños)
+
+
+
+test$nuevos_baños <- gsub("tres","3",test$nuevos_baños)
+test$nuevos_baños <- gsub("cinco","5",test$nuevos_baños)
+test$nuevos_baños <- gsub("dos","2",test$nuevos_baños)
+test$nuevos_baños <- gsub("doss","2",test$nuevos_baños)
+test$nuevos_baños <- gsub("cuatro","4",test$nuevos_baños)
+test$nuevos_baños <- gsub("cuastro","4",test$nuevos_baños)
+test$nuevos_baños <- gsub("seis","6",test$nuevos_baños)
+test$nuevos_baños <- gsub("doas","2",test$nuevos_baños)
+test$nuevos_baños <- gsub("balcn4","4",test$nuevos_baños)
+test$nuevos_baños <- gsub("comerdor2","2",test$nuevos_baños)
+test$nuevos_baños <- gsub("habitaciones4","4",test$nuevos_baños)
+test$nuevos_baños <- gsub("federman2","2",test$nuevos_baños)
+test$nuevos_baños <- gsub("integral3","3",test$nuevos_baños)
+test$nuevos_baños <- gsub("servicio3","3",test$nuevos_baños)
+test$nuevos_baños <- gsub("alcobas3","3",test$nuevos_baños)
+
+
+test$nuevos_baños<-str_extract(test$nuevos_baños,pattern="[:digit:]")
+test$nuevos_baños[is.na(test$nuevos_baños)] = 0
+test$nuevos_baños <- str_trim(test$nuevos_baños,side = c("both"))
+
+test$nuevos_baños <- as.numeric(test$nuevos_baños)
+
+# Este bloque sirve para imputar cuando bathrooms está vacio con nuevos baños
+# La segunda linea pone NA si la imputacion pone un 0
+test %>% mutate(bathrooms=coalesce(bathrooms,nuevos_baños))
+test %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
+
+# Esto hace lo mismo que arriba, pero si nuevos_Baños no sirve usa nuevos_baño
+test %>% mutate(bathrooms=coalesce(bathrooms,nuevos_baño))
+test %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
 
 
 
 #------------------------------------------------------------------------------
+
+# Preparación de la base para el modelo
+
+
+train <- subset(train,select=-c(nuevos_baños,nuevos_baño,geometry,description,title))
+test <- subset(test,select=-c(nuevos_baños,nuevos_baño,geometry,description,title))
+
+as.factor(train$property_type)
+as.factor(test$property_type)
+
+
+
+
+
+
+
+
+
+
+
+
+#------------------------------------------------------------------------------
+
+# XGBoost
+
+
+#Haré la prueba con una base mucho más pequeña
+
+
 
 
 
