@@ -561,6 +561,9 @@ test <- subset(test, select=-c(operation_type,property_id,rooms))
 
   #Baño
 
+#Este me cuenta cada vez que haya una palabra de baño solita
+train$nuevos_baño <- str_count(string=train$description , pattern = "baño[:blank:]" )  
+
 
 #Cuando la palabra es bañoS, este me agarra la palabra que estaba antes
 
@@ -596,25 +599,23 @@ train$nuevos_baños <- str_trim(train$nuevos_baños,side = c("both"))
 
 train$nuevos_baños <- as.numeric(train$nuevos_baños)
 
+# Este bloque sirve para imputar cuando bathrooms está vacio con nuevos baños
+# La segunda linea pone NA si la imputacion pone un 0
+train %>% mutate(bathrooms=coalesce(bathrooms,nuevos_baños))
+train %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
+
+# Esto hace lo mismo que arriba, pero si nuevos_Baños no sirve usa nuevos_baño
+train %>% mutate(bathrooms=coalesce(bathrooms,nuevos_baño))
+train %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
 
 
+# Si nada de esto sirve se procede con la imputación del XGBoost
 
 
 
 #------------------------------------------------------------------------------
 
 
-city <- c("1","2")
-depeto<- c("3","4")
 
-
-for (u in city){
-  for (i in depeto){
-    
-    print(paste0("dist_",u,i))
-    
-  }
-  
-}
 
 
