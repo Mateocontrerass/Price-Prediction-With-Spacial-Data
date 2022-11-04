@@ -532,6 +532,14 @@ for (i in features){
   }
 }
 
+skim(test)
+
+
+write.csv(x = test, file = "test1.csv", sep = ",",
+          row.names = FALSE, col.names = TRUE)
+
+df1 <- read.csv("test1.csv", header = TRUE, sep = ",")
+
 
 
 #------------------------------------------------------------------------------
