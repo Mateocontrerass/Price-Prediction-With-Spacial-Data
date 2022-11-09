@@ -553,7 +553,7 @@ skim(train)
 head(train$surface_total, n = 16L)
 
 # Reducir a minuscula
-train$description<- str_to_lower(string=test$description)
+train$description<- str_to_lower(string=train$description)
 
 # Quitar caracteres inncesarios
 
