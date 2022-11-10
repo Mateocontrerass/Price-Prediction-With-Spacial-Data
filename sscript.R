@@ -916,10 +916,10 @@ train$area <- NA
 
 
 ## replace values
-x5 <- "terraza + [:space:] + de + [:space:] + [:digit:] + [:space:]+"
-x6 <- "terraza + [:space:] +[:alpha:]+ [:space:]+ de + [:space:] + [:digit:] + [:space:]+"
+x5 <- " [:space:]+terraza + [:space:] "
+x6 <- " [:space:]+ terraza + [:space:]+"## +[:alpha:]+ [:space:]+ de + [:space:] + [:digit:] + [:space:]+"
 
-for (i in c("mts","m2","mt2","mts2","metros","cuadrad","mtro","mtr2")){
+for (i in c("mts","m2","mt2","mts2","metros","cuadrad","mtro","mtr2", "metros","metros cuadrados")){
   train <- train %>% 
     mutate(area = ifelse(is.na(area)==T,str_extract(string=description , pattern=paste0(x1,i)),area),
            area = ifelse(is.na(area)==T,str_extract(string=description , pattern=paste0(x2,i)),area),
@@ -929,10 +929,10 @@ for (i in c("mts","m2","mt2","mts2","metros","cuadrad","mtro","mtr2")){
 }
 table(is.na(train$area))
 
-for (i in c("mts","m2","mt2","mts2","metros","cuadrad","mtro","mtr2")){
-  train <- train %>% 
-    mutate( area = ifelse(is.na(str_extract(string=description,pattern=paste0(x5,i)))==T  ,area,NA),
-            area = ifelse(is.na(str_extract(string=description,pattern=paste0(x6,i)))==T,area, NA))
+for (i in c("mts","m2","mt2","mts2","metros","cuadrad","mtro","mtr2","metros cuadrados")){
+  train <- train %>%
+    mutate( area = ifelse(is.na(str_extract(string=description,pattern=paste0(x5,i)))==F,NA,area),
+            area = ifelse(is.na(str_extract(string=description,pattern=paste0(x6,i)))==F,NA, area))
 } 
 table(is.na(train$area)) ## dado que deja muchos NA utilizaremos una metodologÃ­a de vecinos
 
