@@ -31,7 +31,10 @@ p_load(tidyverse,
        mixgb, #XGBoost
        rstudioapi,
        tictoc, ##Saber cuanto demora corriendo el script
-       install = TRUE)
+       rlang)
+
+
+       
 
 set.seed(666)
 
@@ -48,8 +51,8 @@ setwd(path_code)
 #------------------------------------------------------------------------------
 #Importar los datos
 
-p1_train <- import("data/train.rds")
-p1_test <- import("data/test.rds")
+p1_train <- readRDS("data/train.rds")
+p1_test <- readRDS("data/test.rds")
 
 ## dataframe to sf
 train <- st_as_sf(x = p1_train, ## datos
@@ -81,7 +84,7 @@ osm_sf = osm %>% osmdata_sf()
 osm_sf
 
 ## Obtener un objeto sf
-carreteras = osm_sf$osm_lines %>% select(osm_id,name) 
+carreteras <- osm_sf$osm_lines %>% select(osm_id,name) 
 carreteras
 
 
@@ -184,36 +187,34 @@ features <- c("amenity","building","landuse","leisure","shop","tourism")
 
 #features <- c("building","landuse","leisure","shop","tourism")
 
-ciudades <- c("bogota","medellin")
 
-medellin<- subset(train, city=="Medellín") 
 bogota<- subset(train, city=="Bogotá D.C") 
 
 
+#------------------------------------------------------------------------------
 
-
+#Bogota
 
 
 tic()
 
-for (u in ciudades){
 
   for (i in features){
   
       if (i =="amenity"){
         for (j in amenity){
           
-          osm = opq(bbox = getbb(paste(u,"colombia",sep=" "))) %>%
+          osm = opq(bbox = getbb("Bogota Colombia")) %>%
             add_osm_feature(key=i , value=j) 
           
           osm_sf = osm %>% osmdata_sf()
-          generico_j = osm_sf$osm_points %>% select(osm_id) 
+          generico_j = osm_sf$osm_points %>% dplyr::select(osm_id) 
           
           
-          matriz_distancia<-st_distance(x=train,y=generico_j)
+          matriz_distancia<-st_distance(x=bogota,y=generico_j)
           dist_ <- apply(matriz_distancia , 1 , min)
-          train[,ncol(train) + 1]<-dist_
-          colnames(train)[ncol(train)]<-paste0("dist_",j,u)
+          bogota[,ncol(bogota) + 1]<-dist_
+          colnames(bogota)[ncol(bogota)]<-paste0("dist_",j)
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
@@ -225,17 +226,17 @@ for (u in ciudades){
       else if (i == "building"){
         for (j in building){
           
-          osm = opq(bbox = getbb(paste(u,"colombia",sep=" "))) %>%
+          osm = opq(bbox = getbb("Bogota Colombia")) %>%
             add_osm_feature(key=i , value=j) 
           
           osm_sf = osm %>% osmdata_sf()
-          generico_j = osm_sf$osm_points %>% select(osm_id) 
+          generico_j = osm_sf$osm_points %>% dplyr::select(osm_id) 
           
           
-          matriz_distancia<-st_distance(x=train,y=generico_j)
+          matriz_distancia<-st_distance(x=bogota,y=generico_j)
           dist_ <- apply(matriz_distancia , 1 , min)
-          train[,ncol(train) + 1]<-dist_
-          colnames(train)[ncol(train)]<-paste0("dist_",j,u)
+          bogota[,ncol(bogota) + 1]<-dist_
+          colnames(bogota)[ncol(bogota)]<-paste0("dist_",j)
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
@@ -247,17 +248,17 @@ for (u in ciudades){
       else if ( i== "landuse"){
         for (j in landuse){
           
-          osm = opq(bbox = getbb(paste(u,"colombia",sep=" "))) %>%
+          osm = opq(bbox = getbb("Bogota Colombia")) %>%
             add_osm_feature(key=i , value=j) 
           
           osm_sf = osm %>% osmdata_sf()
-          generico_j = osm_sf$osm_points %>% select(osm_id) 
+          generico_j = osm_sf$osm_points %>% dplyr::select(osm_id) 
           
           
-          matriz_distancia<-st_distance(x=train,y=generico_j)
+          matriz_distancia<-st_distance(x=bogota,y=generico_j)
           dist_ <- apply(matriz_distancia , 1 , min)
-          train[,ncol(train) + 1]<-dist_
-          colnames(train)[ncol(train)]<-paste0("dist_",j,u)
+          bogota[,ncol(bogota) + 1]<-dist_
+          colnames(bogota)[ncol(bogota)]<-paste0("dist_",j)
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
@@ -268,17 +269,17 @@ for (u in ciudades){
   
         for (j in leisure){
           
-          osm = opq(bbox = getbb(paste(u,"colombia",sep=" "))) %>%
+          osm = opq(bbox = getbb("Bogota Colombia")) %>%
             add_osm_feature(key=i , value=j) 
           
           osm_sf = osm %>% osmdata_sf()
-          generico_j = osm_sf$osm_points %>% select(osm_id) 
+          generico_j = osm_sf$osm_points %>% dplyr::select(osm_id) 
           
           
-          matriz_distancia<-st_distance(x=train,y=generico_j)
+          matriz_distancia<-st_distance(x=bogota,y=generico_j)
           dist_ <- apply(matriz_distancia , 1 , min)
-          train[,ncol(train) + 1]<-dist_
-          colnames(train)[ncol(train)]<-paste0("dist_",j,u)
+          bogota[,ncol(bogota) + 1]<-dist_
+          colnames(bogota)[ncol(bogota)]<-paste0("dist_",j)
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
@@ -291,17 +292,17 @@ for (u in ciudades){
   
         for (j in shop){
           
-          osm = opq(bbox = getbb(paste(u,"colombia",sep=" "))) %>%
+          osm = opq(bbox = getbb("Bogota Colombia")) %>%
             add_osm_feature(key=i , value=j) 
           
           osm_sf = osm %>% osmdata_sf()
-          generico_j = osm_sf$osm_points %>% select(osm_id) 
+          generico_j = osm_sf$osm_points %>% dplyr::select(osm_id) 
           
           
-          matriz_distancia<-st_distance(x=train,y=generico_j)
+          matriz_distancia<-st_distance(x=bogota,y=generico_j)
           dist_ <- apply(matriz_distancia , 1 , min)
-          train[,ncol(train) + 1]<-dist_
-          colnames(train)[ncol(train)]<-paste0("dist_",j,u)
+          bogota[,ncol(bogota) + 1]<-dist_
+          colnames(bogota)[ncol(bogota)]<-paste0("dist_",j)
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
@@ -314,17 +315,17 @@ for (u in ciudades){
   
         for (j in nature){
           
-          osm = opq(bbox = getbb(paste(u,"colombia",sep=" "))) %>%
+          osm = opq(bbox = getbb("Bogota Colombia")) %>%
             add_osm_feature(key=i , value=j) 
           
           osm_sf = osm %>% osmdata_sf()
-          generico_j = osm_sf$osm_points %>% select(osm_id) 
+          generico_j = osm_sf$osm_points %>% dplyr::select(osm_id) 
           
           
-          matriz_distancia<-st_distance(x=train,y=generico_j)
+          matriz_distancia<-st_distance(x=bogota,y=generico_j)
           dist_ <- apply(matriz_distancia , 1 , min)
-          train[,ncol(train) + 1]<-dist_
-          colnames(train)[ncol(train)]<-paste0("dist_",j,u)
+          bogota[,ncol(bogota) + 1]<-dist_
+          colnames(bogota)[ncol(bogota)]<-paste0("dist_",j)
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
@@ -337,17 +338,17 @@ for (u in ciudades){
   
         for (j in tourism){
           
-          osm = opq(bbox = getbb(paste(u,"colombia",sep=" "))) %>%
+          osm = opq(bbox = getbb("Bogota Colombia")) %>%
             add_osm_feature(key=i , value=j) 
           
           osm_sf = osm %>% osmdata_sf()
-          generico_j = osm_sf$osm_points %>% select(osm_id) 
+          generico_j = osm_sf$osm_points %>% dplyr::select(osm_id) 
           
           
-          matriz_distancia<-st_distance(x=train,y=generico_j)
+          matriz_distancia<-st_distance(x=bogota,y=generico_j)
           dist_ <- apply(matriz_distancia , 1 , min)
-          train[,ncol(train) + 1]<-dist_
-          colnames(train)[ncol(train)]<-paste0("dist_",j,u)
+          bogota[,ncol(bogota) + 1]<-dist_
+          colnames(bogota)[ncol(bogota)]<-paste0("dist_",j)
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
@@ -358,19 +359,203 @@ for (u in ciudades){
       }
   }
 
-}
+
 toc()
 
 
-write.csv(x = prueba_bog, file = "prueba1.csv", sep = ",",
-          row.names = FALSE, col.names = TRUE)
+write.csv(x = bogota, file = "bogota.csv", sep = ",",
+          row.names = T, col.names = TRUE)
 
-df <- read.csv("prueba1.csv", header = TRUE, sep = ",")
+df <- read.csv("bogota.csv", header = TRUE, sep = ",")
 
-skim(df)
+
 
 #------------------------------------------------------------------------------
-#Pa cali
+#Medellin
+
+#Base medellin
+medellin<- subset(train, city=="Medellín") 
+
+
+tic()
+
+
+for (i in features){
+  
+  if (i =="amenity"){
+    for (j in amenity){
+      
+      osm = opq(bbox = getbb("medellin Colombia")) %>%
+        add_osm_feature(key=i , value=j) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
+      
+      
+      matriz_distancia<-st_distance(x=medellin,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      medellin[,ncol(medellin) + 1]<-dist_
+      colnames(medellin)[ncol(medellin)]<-paste0("dist_",j)
+      
+      avance <- paste0("Terminada feature ", j, ".")
+      print(avance)
+      
+    }
+    
+    
+  }
+  else if (i == "building"){
+    for (j in building){
+      
+      osm = opq(bbox = getbb("medellin Colombia")) %>%
+        add_osm_feature(key=i , value=j) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
+      
+      
+      matriz_distancia<-st_distance(x=medellin,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      medellin[,ncol(medellin) + 1]<-dist_
+      colnames(medellin)[ncol(medellin)]<-paste0("dist_",j)
+      
+      avance <- paste0("Terminada feature ", j, ".")
+      print(avance)
+      
+    }
+    
+    
+  }
+  else if ( i== "landuse"){
+    for (j in landuse){
+      
+      osm = opq(bbox = getbb("medellin Colombia")) %>%
+        add_osm_feature(key=i , value=j) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
+      
+      
+      matriz_distancia<-st_distance(x=medellin,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      medellin[,ncol(medellin) + 1]<-dist_
+      colnames(medellin)[ncol(medellin)]<-paste0("dist_",j)
+      
+      avance <- paste0("Terminada feature ", j, ".")
+      print(avance)
+      
+    }      
+  }
+  else if (i=="leisure"){
+    
+    for (j in leisure){
+      
+      osm = opq(bbox = getbb("medellin Colombia")) %>%
+        add_osm_feature(key=i , value=j) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
+      
+      
+      matriz_distancia<-st_distance(x=medellin,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      medellin[,ncol(medellin) + 1]<-dist_
+      colnames(medellin)[ncol(medellin)]<-paste0("dist_",j)
+      
+      avance <- paste0("Terminada feature ", j, ".")
+      print(avance)
+      
+    }
+    
+    
+  }
+  else if (i=="shop"){
+    
+    for (j in shop){
+      
+      osm = opq(bbox = getbb("medellin Colombia")) %>%
+        add_osm_feature(key=i , value=j) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
+      
+      
+      matriz_distancia<-st_distance(x=medellin,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      medellin[,ncol(medellin) + 1]<-dist_
+      colnames(medellin)[ncol(medellin)]<-paste0("dist_",j)
+      
+      avance <- paste0("Terminada feature ", j, ".")
+      print(avance)
+      
+    }
+    
+    
+  }
+  else if (i=="nature"){
+    
+    for (j in nature){
+      
+      osm = opq(bbox = getbb("medellin Colombia")) %>%
+        add_osm_feature(key=i , value=j) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
+      
+      
+      matriz_distancia<-st_distance(x=medellin,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      medellin[,ncol(medellin) + 1]<-dist_
+      colnames(medellin)[ncol(medellin)]<-paste0("dist_",j)
+      
+      avance <- paste0("Terminada feature ", j, ".")
+      print(avance)
+      
+    }
+    
+    
+  }
+  else if (i=="tourism"){
+    
+    for (j in tourism){
+      
+      osm = opq(bbox = getbb("medellin Colombia")) %>%
+        add_osm_feature(key=i , value=j) 
+      
+      osm_sf = osm %>% osmdata_sf()
+      generico_j = osm_sf$osm_points %>% select(osm_id) 
+      
+      
+      matriz_distancia<-st_distance(x=medellin,y=generico_j)
+      dist_ <- apply(matriz_distancia , 1 , min)
+      medellin[,ncol(medellin) + 1]<-dist_
+      colnames(medellin)[ncol(medellin)]<-paste0("dist_",j)
+      
+      avance <- paste0("Terminada feature ", j, ".")
+      print(avance)
+      
+    }
+    
+    
+  }
+}
+
+
+toc()
+
+
+write.csv(x = medellin, file = "medellin.csv", sep = ",",
+          row.names = T, col.names = TRUE)
+
+df <- read.csv("medellin.csv", header = TRUE, sep = ",")
+
+
+
+
+
+
+#------------------------------------------------------------------------------
+#Pa cali (Bien)
 
 for (i in features){
   
@@ -539,6 +724,12 @@ write.csv(x = test, file = "test1.csv", sep = ",",
           row.names = FALSE, col.names = TRUE)
 
 df1 <- read.csv("test1.csv", header = TRUE, sep = ",")
+
+
+#------------------------------------------------------------------------------
+#Pegar las bases
+
+train<- rbind(bogota,medellin)
 
 
 
@@ -724,10 +915,13 @@ test %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
 train <- subset(train,select=-c(nuevos_baños,nuevos_baño,geometry,description,title))
 test <- subset(test,select=-c(nuevos_baños,nuevos_baño,geometry,description,title))
 
-as.factor(train$property_type)
-as.factor(test$property_type)
+train$property_type <- as.factor(train$property_type)
+train$city          <- as.factor(train$city) 
+test$property_type  <- as.factor(test$property_type)
 
 
+# % de cada ciudad
+prop.table(table(train$city))
 
 
 
@@ -744,6 +938,17 @@ as.factor(test$property_type)
 
 
 #Haré la prueba con una base mucho más pequeña
+
+
+
+
+
+
+
+
+
+
+
 
 
 
