@@ -732,6 +732,15 @@ df1 <- read.csv("test1.csv", header = TRUE, sep = ",")
 train<- rbind(bogota,medellin)
 
 
+#------------------------------------------------------------------------------
+
+#Area
+
+bogota <- read.csv("bogota.csv", header = TRUE, sep = ",")
+
+mnz <- st_read("sector_shp/SECTOR.shp")
+
+
 
 #------------------------------------------------------------------------------
 #Regex
@@ -905,36 +914,7 @@ test %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
 test %>% mutate(bathrooms=coalesce(bathrooms,nuevos_baño))
 test %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
 
-#----------------------------------------------------------------------------
-#Área de las viviendas 
 
-x1 <- "[:space:]+[:digit:]+[:space:]+"
-x2 <- "[:space:]+[:digit:]+[:punct:]+[:digit:]+[:space:]+"
-x3 <- "[:digit:]+[:space:]+"
-x4 <- "[:digit:]+"
-train$area <- NA
-
-
-## replace values
-x5 <- " [:space:]+terraza + [:space:] "
-x6 <- " [:space:]+ terraza + [:space:]+"## +[:alpha:]+ [:space:]+ de + [:space:] + [:digit:] + [:space:]+"
-
-for (i in c("mts","m2","mt2","mts2","metros","cuadrad","mtro","mtr2", "metros","metros cuadrados")){
-  train <- train %>% 
-    mutate(area = ifelse(is.na(area)==T,str_extract(string=description , pattern=paste0(x1,i)),area),
-           area = ifelse(is.na(area)==T,str_extract(string=description , pattern=paste0(x2,i)),area),
-           area = ifelse(is.na(area)==T,str_extract(string=description , pattern=paste0(x3,i)),area),
-           area = ifelse(is.na(area)==T,str_extract(string=description , pattern=paste0(x4,i)),area),
-           )
-}
-table(is.na(train$area))
-
-for (i in c("mts","m2","mt2","mts2","metros","cuadrad","mtro","mtr2","metros cuadrados")){
-  train <- train %>%
-    mutate( area = ifelse(is.na(str_extract(string=description,pattern=paste0(x5,i)))==F,NA,area),
-            area = ifelse(is.na(str_extract(string=description,pattern=paste0(x6,i)))==F,NA, area))
-} 
-table(is.na(train$area)) ## dado que deja muchos NA utilizaremos una metodologÃ­a de vecinos
 
 #------------------------------------------------------------------------------
 
