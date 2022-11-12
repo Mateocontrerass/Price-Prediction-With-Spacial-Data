@@ -33,7 +33,15 @@ p_load(tidyverse,
        tictoc, ##Saber cuanto demora corriendo el script
        rlang)
 
+install.packages("mltools")
+library(mltools)
+library(xgboost)
 
+install.packages("mixgb")
+install.packages("vctrs")
+
+library(vctrs)
+library(mixgb)
        
 
 set.seed(666)
@@ -64,7 +72,7 @@ test <- st_as_sf(x = p1_test, ## datos
                    coords=c("lon","lat"), ## coordenadas
                    crs=4326) ## CRS
 
-
+rm(p1_test,p1_train)
 
 
 
@@ -170,7 +178,7 @@ toc()
 ### Este si
 
 amenity<- c("cafe","pub","restaurant","college","library","school","university","fuel","atm","bank",
-              "clinic","hospital","pharmacy","cinema","gambling","nightclub","courthouse","police","townhall","bus_station")
+              "clinic","hospital","pharmacy","cinema","nightclub","courthouse","police","bus_station")
 
 building<-c("cathedral","church","stadium")
 
@@ -178,14 +186,15 @@ landuse<-c("commercial","education","industrial")
 
 leisure<- c("fitness_centre","park","playground")
 
-shop <- c("alcohol","bakery","coffee","mall","supermarket","jewelry","cosmetics","car")
+shop <- c("alcohol","coffee","mall","supermarket","jewelry","cosmetics")
 
 
-tourism <- c("hotel")
 
-features <- c("amenity","building","landuse","leisure","shop","tourism")
+#features <- c("amenity","building","landuse","leisure","shop")
 
-#features <- c("building","landuse","leisure","shop","tourism")
+features <- c("leisure")
+
+
 
 
 bogota<- subset(train, city=="Bogotá D.C") 
@@ -218,6 +227,7 @@ tic()
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
+          write.csv2(x=bogota, file="bogota.csv")
           
         }
         
@@ -240,6 +250,8 @@ tic()
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
+          write.csv2(x=bogota, file="bogota.csv")
+          
           
         }
         
@@ -262,6 +274,8 @@ tic()
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
+          write.csv2(x=bogota, file="bogota.csv")
+          
           
         }      
       }
@@ -283,6 +297,7 @@ tic()
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
+          write.csv2(x=bogota, file="bogota.csv")
           
         }
         
@@ -306,6 +321,7 @@ tic()
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
+          write.csv2(x=bogota, file="bogota.csv")
           
         }
         
@@ -329,46 +345,28 @@ tic()
           
           avance <- paste0("Terminada feature ", j, ".")
           print(avance)
+          write.csv2(x=bogota, file="bogota.csv")
           
         }
         
         
       }
-      else if (i=="tourism"){
-  
-        for (j in tourism){
-          
-          osm = opq(bbox = getbb("Bogota Colombia")) %>%
-            add_osm_feature(key=i , value=j) 
-          
-          osm_sf = osm %>% osmdata_sf()
-          generico_j = osm_sf$osm_points %>% dplyr::select(osm_id) 
-          
-          
-          matriz_distancia<-st_distance(x=bogota,y=generico_j)
-          dist_ <- apply(matriz_distancia , 1 , min)
-          bogota[,ncol(bogota) + 1]<-dist_
-          colnames(bogota)[ncol(bogota)]<-paste0("dist_",j)
-          
-          avance <- paste0("Terminada feature ", j, ".")
-          print(avance)
-          
-        }
-        
-        
-      }
+
   }
 
 
 toc()
 
 
+<<<<<<< Updated upstream
 write.csv(x = bogota, file = "bogota_1.0.csv", sep = ",",
           row.names = T, col.names = TRUE)
 
 df <- read.csv("bogota_1.0.csv", header = T, sep = ",")
 
 
+=======
+>>>>>>> Stashed changes
 
 #------------------------------------------------------------------------------
 #Medellin
@@ -399,6 +397,8 @@ for (i in features){
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
+      write.csv2(x=medellin, file="medellin.csv")
+      
       
     }
     
@@ -421,6 +421,7 @@ for (i in features){
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
+      write.csv2(x=medellin, file="medellin.csv")
       
     }
     
@@ -443,6 +444,7 @@ for (i in features){
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
+      write.csv2(x=medellin, file="medellin.csv")
       
     }      
   }
@@ -464,6 +466,7 @@ for (i in features){
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
+      write.csv2(x=medellin, file="medellin.csv")
       
     }
     
@@ -487,69 +490,18 @@ for (i in features){
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
+      write.csv2(x=medellin, file="medellin.csv")
       
     }
     
     
   }
-  else if (i=="nature"){
-    
-    for (j in nature){
-      
-      osm = opq(bbox = getbb("medellin Colombia")) %>%
-        add_osm_feature(key=i , value=j) 
-      
-      osm_sf = osm %>% osmdata_sf()
-      generico_j = osm_sf$osm_points %>% select(osm_id) 
-      
-      
-      matriz_distancia<-st_distance(x=medellin,y=generico_j)
-      dist_ <- apply(matriz_distancia , 1 , min)
-      medellin[,ncol(medellin) + 1]<-dist_
-      colnames(medellin)[ncol(medellin)]<-paste0("dist_",j)
-      
-      avance <- paste0("Terminada feature ", j, ".")
-      print(avance)
-      
-    }
-    
-    
-  }
-  else if (i=="tourism"){
-    
-    for (j in tourism){
-      
-      osm = opq(bbox = getbb("medellin Colombia")) %>%
-        add_osm_feature(key=i , value=j) 
-      
-      osm_sf = osm %>% osmdata_sf()
-      generico_j = osm_sf$osm_points %>% select(osm_id) 
-      
-      
-      matriz_distancia<-st_distance(x=medellin,y=generico_j)
-      dist_ <- apply(matriz_distancia , 1 , min)
-      medellin[,ncol(medellin) + 1]<-dist_
-      colnames(medellin)[ncol(medellin)]<-paste0("dist_",j)
-      
-      avance <- paste0("Terminada feature ", j, ".")
-      print(avance)
-      
-    }
-    
-    
-  }
+
+
 }
 
 
 toc()
-
-
-write.csv(x = medellin, file = "medellin.csv", sep = ",",
-          row.names = T, col.names = TRUE)
-
-df <- read.csv("medellin.csv", header = TRUE, sep = ",")
-
-
 
 
 
@@ -578,6 +530,7 @@ for (i in features){
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
+      write.csv2(x=test, file="cali.csv")
       
     }
     
@@ -600,6 +553,8 @@ for (i in features){
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
+      write.csv2(x=test, file="cali.csv")
+      
       
     }
     
@@ -622,6 +577,8 @@ for (i in features){
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
+      write.csv2(x=test, file="cali.csv")
+      
       
     }      
   }
@@ -643,6 +600,8 @@ for (i in features){
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
+      write.csv2(x=test, file="cali.csv")
+      
       
     }
     
@@ -666,68 +625,25 @@ for (i in features){
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
+      write.csv2(x=test, file="cali.csv")
+      
       
     }
     
     
   }
-  else if (i=="nature"){
-    
-    for (j in nature){
-      
-      osm = opq(bbox = getbb("cali colombia")) %>%
-        add_osm_feature(key=i , value=j) 
-      
-      osm_sf = osm %>% osmdata_sf()
-      generico_j = osm_sf$osm_points %>% select(osm_id) 
-      
-      
-      matriz_distancia<-st_distance(x=test,y=generico_j)
-      dist_ <- apply(matriz_distancia , 1 , min)
-      test[,ncol(test) + 1]<-dist_
-      colnames(test)[ncol(test)]<-paste0("dist_",j)
-      
-      avance <- paste0("Terminada feature ", j, ".")
-      print(avance)
-      
-    }
-    
-    
-  }
-  else if (i=="tourism"){
-    
-    for (j in tourism){
-      
-      osm = opq(bbox = getbb("cali colombia")) %>%
-        add_osm_feature(key=i , value=j) 
-      
-      osm_sf = osm %>% osmdata_sf()
-      generico_j = osm_sf$osm_points %>% select(osm_id) 
-      
-      
-      matriz_distancia<-st_distance(x=test,y=generico_j)
-      dist_ <- apply(matriz_distancia , 1 , min)
-      test[,ncol(test) + 1]<-dist_
-      colnames(test)[ncol(test)]<-paste0("dist_",j)
-      
-      avance <- paste0("Terminada feature ", j, ".")
-      print(avance)
-      
-    }
-    
-    
-  }
-}
 
+<<<<<<< Updated upstream
 toc()
 
 skim(test)
+=======
+
+}
+>>>>>>> Stashed changes
 
 
-write.csv(x = test, file = "test1.csv", sep = ",",
-          row.names = FALSE, col.names = TRUE)
 
-df1 <- read.csv("test1.csv", header = TRUE, sep = ",")
 
 
 #------------------------------------------------------------------------------
@@ -861,6 +777,8 @@ train %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
 # Esto hace lo mismo que arriba, pero si nuevos_Baños no sirve usa nuevos_baño
 train %>% mutate(bathrooms=coalesce(bathrooms,nuevos_baño))
 train %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
+
+train<-subset(train,select=-c(nuevos_baño,nuevos_baños))
 #------------------------------------------------------------------------------
 
 # Baños pa test
@@ -927,6 +845,7 @@ test %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
 test %>% mutate(bathrooms=coalesce(bathrooms,nuevos_baño))
 test %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
 
+test<-subset(test,select=-c(nuevos_baño,nuevos_baños))
 
 
 #------------------------------------------------------------------------------
@@ -934,22 +853,69 @@ test %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
 # Preparación de la base para el modelo
 
 
-train <- subset(train,select=-c(nuevos_baños,nuevos_baño,geometry,description,title))
-test <- subset(test,select=-c(nuevos_baños,nuevos_baño,geometry,description,title))
+train <- subset(train,select=-c(geometry,description,title))
+test <- subset(test,select=-c(geometry,description,title))
+
+train <- select(train,-geometry)
+test  <- select(test,-geometry)
+
+
+#Dejar geometria
+train <- st_drop_geometry(train)
+test <- st_drop_geometry(test)
 
 train$property_type <- as.factor(train$property_type)
 train$city          <- as.factor(train$city) 
 test$property_type  <- as.factor(test$property_type)
+test$city           <- as.factor(test$city) 
+
 
 
 # % de cada ciudad
 prop.table(table(train$city))
 
+library(rsample)
+
+split<-rsample::initial_split(train,prop=0.2,strata=city)
+
+training_set<-rsample::training(split)
+testing_set<-rsample::testing(split)
+
+prop.table(table(training_set$city))
+
+install.packages("data.table")
+library(data.table)
+
+setDT(training_set)
+setDT(testing_set)
+
+
+#NA
+
+table(is.na(training_set))
+sapply(training_set, function(x) sum(is.na(x))/length(x))*100
+
+table(is.na(testing_set))
+sapply(testing_set, function(x) sum(is.na(x))/length(x))*100
+
+
+#codificacion
 
 
 
+new_tr<-one_hot(as.data.table(training_set))
+new_ts<-one_hot(as.data.table(testing_set))
+
+new_tr<-as.matrix(new_tr)
+new_ts<-as.matrix(new_ts)
 
 
+output<-training_set$price
+output_test<-testing_set$price
+
+
+dtrain <- xgb.DMatrix(data=new_tr, label=output)
+dtest <- xgb.DMatrix(data=new_ts, label=output_test)
 
 
 
@@ -961,15 +927,32 @@ prop.table(table(train$city))
 
 #Haré la prueba con una base mucho más pequeña
 
+#Default parametros
+
+set.seed(999)
+params <- list(booster = "gbtree",
+               eta=0.3, gamma=0, max_depth=6, min_child_weight=1,
+               subsample=1, colsample_bytree=1)
+
+#Pa saber # arboles
+xgbcv <- xgb.cv(params = params, data = dtrain , nrounds = 500, nfold = 5,
+                showsd = T, stratified = T, print_every_n = 10, early_stop_round = 20,
+                maximize = F)
 
 
+elog <- as.data.frame(xgbcv$evaluation_log)
+
+(nrounds<-which.min(elog$test_rmse_mean))
+
+model <- xgboost(data=dtrain,label=output,nrounds=nrounds,
+                 params = params)
+
+pred <- predict(model,dtest)
 
 
+library(MLmetrics)
 
-
-
-
-
+RMSE(pred,testing_set$price)
 
 
 
