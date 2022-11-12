@@ -197,14 +197,12 @@ features <- c("amenity","landuse","leisure","shop")
 
 
 
-
-bogota<- subset(train, city=="Bogotá D.C") 
-
-
 #------------------------------------------------------------------------------
 
 #Bogota
 
+
+bogota<- subset(train, city=="Bogotá D.C") 
 
 tic()
 
@@ -359,14 +357,12 @@ tic()
 toc()
 
 
-write.csv(x = bogota, file = "bogota_1.0.csv", sep = ",",
+write.csv2(x = bogota, file = "bogota_funciona.csv", sep = ";",
           row.names = T, col.names = TRUE)
 
-df <- read.csv("bogota_1.0.csv", header = T, sep = ",")
+write.csv(x=)
 
-
-
-prueba<-read.csv("bogota_1.0.csv")
+df <- read.csv2("bogota.csv", header = T, sep = ";")
 
 
 #------------------------------------------------------------------------------
@@ -504,6 +500,10 @@ for (i in features){
 
 toc()
 
+write.csv(x = medellin, file = "medellin.csv", sep = ",",
+          row.names = T, col.names = TRUE)
+
+df_med <- read.csv2("medellin.csv", header = T, sep = ";")
 
 
 
@@ -649,19 +649,28 @@ train<- rbind(bogota,medellin)
 
 #Area
 
-bogota <- read.csv("prueba1.csv", header = F, sep = ",")
-bogota <- select(bogota, -V1)
-
-for i in 1:
-
-write.csv(x = bogota, file = "porfavo.csv", sep = ",",
-          row.names = T, col.names = F)
-
-bogota <- read.csv("porfavo.csv", header = F, sep = ",")
-
-
 mnz <- st_read("sector_shp/SECTOR.shp")
 
+mnz <- st_transform(mnz, crs=4326)
+
+df_bogota <- st_transform(bogota, crs=4326)
+
+
+## unir dos conjuntos de datos basados en la geometría
+
+house <- st_join(df_bogota, mnz["SCANOMBRE"])
+
+house <- st_join(x=df_bogota , y=mnz)
+
+house %>% select(rooms,bedrooms,bathrooms,surface_total,MANZ_CCNCT)
+
+## Veamos la intuición primero
+new_house <- house[st_buffer(house[100,],200),]
+new_mnz <- mnz[new_house,]
+
+leaflet() %>% addTiles() %>%
+  addPolygons(data=new_mnz,col="red") %>%
+  addCircles(data=new_house)
 
 
 #------------------------------------------------------------------------------
