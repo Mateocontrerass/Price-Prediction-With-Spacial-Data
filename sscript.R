@@ -357,16 +357,11 @@ tic()
 
 toc()
 
-
-<<<<<<< Updated upstream
 write.csv(x = bogota, file = "bogota_1.0.csv", sep = ",",
           row.names = T, col.names = TRUE)
 
 df <- read.csv("bogota_1.0.csv", header = T, sep = ",")
 
-
-=======
->>>>>>> Stashed changes
 
 #------------------------------------------------------------------------------
 #Medellin
@@ -633,14 +628,13 @@ for (i in features){
     
   }
 
-<<<<<<< Updated upstream
 toc()
 
 skim(test)
-=======
+
 
 }
->>>>>>> Stashed changes
+
 
 
 
