@@ -363,10 +363,10 @@ tic()
 toc()
 
 
-write.csv(x = bogota, file = "bogota.csv", sep = ",",
+write.csv(x = bogota, file = "bogota_1.0.csv", sep = ",",
           row.names = T, col.names = TRUE)
 
-df <- read.csv("bogota.csv", header = TRUE, sep = ",")
+df <- read.csv("bogota_1.0.csv", header = T, sep = ",")
 
 
 
@@ -557,6 +557,8 @@ df <- read.csv("medellin.csv", header = TRUE, sep = ",")
 #------------------------------------------------------------------------------
 #Pa cali (Bien)
 
+tic()
+
 for (i in features){
   
   if (i =="amenity"){
@@ -717,6 +719,8 @@ for (i in features){
   }
 }
 
+toc()
+
 skim(test)
 
 
@@ -736,7 +740,16 @@ train<- rbind(bogota,medellin)
 
 #Area
 
-bogota <- read.csv("bogota.csv", header = TRUE, sep = ",")
+bogota <- read.csv("prueba1.csv", header = F, sep = ",")
+bogota <- select(bogota, -V1)
+
+for i in 1:
+
+write.csv(x = bogota, file = "porfavo.csv", sep = ",",
+          row.names = T, col.names = F)
+
+bogota <- read.csv("porfavo.csv", header = F, sep = ",")
+
 
 mnz <- st_read("sector_shp/SECTOR.shp")
 
