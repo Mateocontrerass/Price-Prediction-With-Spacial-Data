@@ -39,10 +39,14 @@ library(xgboost)
 
 install.packages("mixgb")
 install.packages("vctrs")
+install.packages("mlr")
+#install.packages("mlr3")
 
 library(vctrs)
 library(mixgb)
-       
+library(mlr)
+#library(mlr3)
+
 
 set.seed(666)
 
@@ -178,9 +182,7 @@ toc()
 ### Este si
 
 amenity<- c("cafe","pub","restaurant","college","library","school","university","fuel","atm","bank",
-              "clinic","hospital","pharmacy","cinema","nightclub","courthouse","police","bus_station")
-
-building<-c("cathedral","church","stadium")
+              "clinic","hospital","pharmacy","cinema","nightclub","police","bus_station")
 
 landuse<-c("commercial","education","industrial")
 
@@ -190,9 +192,8 @@ shop <- c("alcohol","coffee","mall","supermarket","jewelry","cosmetics")
 
 
 
-#features <- c("amenity","building","landuse","leisure","shop")
+features <- c("amenity","landuse","leisure","shop")
 
-features <- c("leisure")
 
 
 
@@ -358,15 +359,15 @@ tic()
 toc()
 
 
-<<<<<<< Updated upstream
 write.csv(x = bogota, file = "bogota_1.0.csv", sep = ",",
           row.names = T, col.names = TRUE)
 
 df <- read.csv("bogota_1.0.csv", header = T, sep = ",")
 
 
-=======
->>>>>>> Stashed changes
+
+prueba<-read.csv("bogota_1.0.csv")
+
 
 #------------------------------------------------------------------------------
 #Medellin
@@ -633,14 +634,6 @@ for (i in features){
     
   }
 
-<<<<<<< Updated upstream
-toc()
-
-skim(test)
-=======
-
-}
->>>>>>> Stashed changes
 
 
 
@@ -942,9 +935,12 @@ xgbcv <- xgb.cv(params = params, data = dtrain , nrounds = 500, nfold = 5,
 
 elog <- as.data.frame(xgbcv$evaluation_log)
 
+#arboles recomendados
+
 (nrounds<-which.min(elog$test_rmse_mean))
 
-model <- xgboost(data=dtrain,label=output,nrounds=nrounds,
+model <- xgboost(data=dtrain,label=output,
+                 nrounds=nrounds,
                  params = params)
 
 pred <- predict(model,dtest)
@@ -953,6 +949,29 @@ pred <- predict(model,dtest)
 library(MLmetrics)
 
 RMSE(pred,testing_set$price)
+
+#------------------------------------------------------------------------------
+
+#Ahora tunear parametros
+
+lrn <- makeLearner("regr.xgboost")
+
+
+df_train<-as.data.frame(new_tr)
+
+colnames(df_train)[1]<-"Bogota"
+colnames(df_train)[2]<-"Medellin"
+
+
+traintask<-makeRegrTask(data=df_train,target="price")
+
+
+lrn$par.vals <- list(objective="reg:linear",nrounds=100L, eta=0.1 )
+
+params <- makeParamSet()
+
+
+colnames(df_train) <- make.names(colnames(df_train),unique = T)
 
 
 
