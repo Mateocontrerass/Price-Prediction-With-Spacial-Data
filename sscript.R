@@ -658,11 +658,12 @@ df_bogota <- st_transform(bogota, crs=4326)
 
 ## unir dos conjuntos de datos basados en la geometría
 
-house <- st_join(df_bogota, mnz["SCANOMBRE"])
-
 house <- st_join(x=df_bogota , y=mnz)
 
-house %>% select(rooms,bedrooms,bathrooms,surface_total,MANZ_CCNCT)
+
+write.csv2(x = medellin, file = "house_bogota.csv", sep = ";",
+          row.names = T, col.names = TRUE)
+
 
 ## Veamos la intuición primero
 new_house <- house[st_buffer(house[100,],200),]
