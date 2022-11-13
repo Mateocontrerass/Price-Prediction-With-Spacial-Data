@@ -357,14 +357,6 @@ tic()
 toc()
 
 
-write.csv2(x = bogota, file = "bogota_funciona.csv", sep = ";",
-          row.names = T, col.names = TRUE)
-
-write.csv(x=)
-
-df <- read.csv2("bogota.csv", header = T, sep = ";")
-
-
 #------------------------------------------------------------------------------
 #Medellin
 
@@ -500,12 +492,6 @@ for (i in features){
 
 toc()
 
-write.csv(x = medellin, file = "medellin.csv", sep = ",",
-          row.names = T, col.names = TRUE)
-
-df_med <- read.csv2("medellin.csv", header = T, sep = ";")
-
-
 
 #------------------------------------------------------------------------------
 #Pa cali (Bien)
@@ -626,7 +612,7 @@ for (i in features){
       
       avance <- paste0("Terminada feature ", j, ".")
       print(avance)
-      write.csv2(x=test, file="cali.csv")
+      write.csv2(x=test, file="data/cali_final.csv")
       
       
     }
@@ -634,7 +620,7 @@ for (i in features){
     
   }
 
-
+toc()
 
 
 
@@ -647,7 +633,7 @@ train<- rbind(bogota,medellin)
 
 #------------------------------------------------------------------------------
 
-#Area
+#Juntando barrios para bogotá
 
 mnz <- st_read("sector_shp/SECTOR.shp")
 
@@ -656,13 +642,17 @@ mnz <- st_transform(mnz, crs=4326)
 df_bogota <- st_transform(bogota, crs=4326)
 
 
+
+
 ## unir dos conjuntos de datos basados en la geometría
 
 house <- st_join(x=df_bogota , y=mnz)
 
 
-write.csv2(x = medellin, file = "house_bogota.csv", sep = ";",
-          row.names = T, col.names = TRUE)
+write.csv2(x = bogota, file = "bogota_loop.csv", sep = ";",
+          row.names = F, col.names = TRUE)
+
+x<-read.csv2("bogota_loop.csv", header = T, sep = ";")
 
 
 ## Veamos la intuición primero
@@ -672,6 +662,12 @@ new_mnz <- mnz[new_house,]
 leaflet() %>% addTiles() %>%
   addPolygons(data=new_mnz,col="red") %>%
   addCircles(data=new_house)
+
+
+## Medellin
+
+df_medellin <- read.csv("data/catastro_repositorio2_gdb.csv", header = T,
+                        sep = ",")
 
 
 #------------------------------------------------------------------------------
