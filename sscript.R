@@ -435,6 +435,7 @@ for (i in features){
     
     
   }
+
   
   else if ( i== "landuse"){
     for (j in landuse){
@@ -540,11 +541,10 @@ for (i in features){
 
 #Juntando barrios para bogotá
 
-mnz <- st_read("sector_shp/SECTOR.shp")
+mnz <- st_read("data/manz_shp_bogota/MANZ.shp")
 
 mnz <- st_transform(mnz, crs=4326)
 
-df_bogota <- st_transform(bogota, crs=4326)
 
 
 
@@ -560,13 +560,33 @@ write.csv2(x = bogota, file = "bogota_loop.csv", sep = ";",
 x<-read.csv2("bogota_loop.csv", header = T, sep = ";")
 
 
+
+
+####
+train_f <- read_csv2("data/train_final.csv")
+bogota_f <- subset(train_f,train$city == "Bogotá D.C")
+prueba <- subset(p1_train,train$city == "Bogotá D.C")
+prueba <- select(prueba, c(property_id, lat, lon) )
+bogota_f <- merge(x=bogota_f,y=prueba,by="property_id")
+bogota_sf <- st_as_sf(x = bogota_f, ## datos,
+                      coords=c("lon","lat"), ## coordenadas
+                      crs=4326) ## CRS
+sf_use_s2(F)
+house_bogota <- st_join(x=bogota_sf , y=mnz)
+
 ## Veamos la intuición primero
-new_house <- house[st_buffer(house[100,],200),]
+new_house <- house_bogota[st_buffer(house_bogota[100,],200),]
 new_mnz <- mnz[new_house,]
 
 leaflet() %>% addTiles() %>%
   addPolygons(data=new_mnz,col="red") %>%
   addCircles(data=new_house)
+
+new_house_sp <- new_house %>% st_buffer(20) %>% as_Spatial()
+install.packages("spdep")
+library(spdep)
+nb_house = poly2nb(pl=new_house_sp , queen=T) # opcion reina
+nb_house[[32]]
 
 
 ## Medellin
