@@ -1,4 +1,4 @@
-## Problem Set 3 : Predicting price with Spacial data
+3## Problem Set 3 : Predicting price with Spacial data
 # Big data and Machine Learning
 
 # Mateo Contreras
@@ -32,6 +32,13 @@ p_load(tidyverse,
        rstudioapi,
        tictoc, ##Saber cuanto demora corriendo el script
        rlang)
+
+p_load(glue,
+       hexbin, # genera un grafico de exagonos
+       patchwork,vip, ## plot: 
+       ggrepel, ## plot: geom_text_repel
+       stringi,tidytext,stopwords, ## text-data
+       tidymodels,finetune) 
 
 install.packages("mltools")
 library(mltools)
@@ -672,6 +679,79 @@ df_medellin <- read.csv("data/catastro_repositorio2_gdb.csv", header = T,
 
 #------------------------------------------------------------------------------
 #Regex
+
+bogota<-read.csv2("house_bogota.csv", sep=";", header = T) %>%
+  select(-X) %>% mutate(description=str_to_lower(description),
+                        description=stri_trans_general(str = description, id = "Latin-ASCII"))
+
+bogota %>% count(price)
+
+bogota$description <- gsub("nuevo", "remodelada", bogota$description)
+bogota$description <- gsub("nueva", "remodelada", bogota$description)
+bogota$description <- gsub("remodelado", "remodelada", bogota$description)
+bogota$description <- gsub("estrenar", "remodelada", bogota$description)
+bogota$description <- gsub("construida", "remodelada", bogota$description)
+bogota$description <- gsub("modelada", "remodelada", bogota$description)
+
+bogota$description <- gsub("bao","bano", bogota$description)
+bogota$description <- gsub("baño","bano", bogota$description)
+bogota$description <- gsub("banos","bano", bogota$description)
+bogota$description <- gsub("baos","bano", bogota$description)
+
+bogota$description <- gsub("apto","apartamento", bogota$description)
+
+bogota$description <- gsub("balcn","balcon", bogota$description)
+bogota$description <- gsub("balcones", "balcon", bogota$description)
+
+
+bogota$description <- gsub("alcobas","habitaciones", bogota$description)
+bogota$description <- gsub("habitacin", "habitaciones", bogota$description)
+
+bogota$description <- gsub("parqueaderos","parqueadero", bogota$description)
+bogota$description <- gsub("garajes","parqueadero", bogota$description)
+bogota$description <- gsub("garaje","parqueadero", bogota$description)
+bogota$description <- gsub("parqueo", "parqueadero", bogota$description)
+
+bogota$description <- gsub("terrazas", "terraza", bogota$description)
+
+bogota$description <- gsub("mts2","m2", bogota$description)
+bogota$description <- gsub("cuadrados","m2", bogota$description)
+bogota$description <- gsub("mt2", "m2", bogota$description)
+
+bogota$description <- gsub("metros","mts", bogota$description)
+
+bogota$description <- gsub("ascensores", "ascensor", bogota$description)
+
+bogota$description <- gsub("ropas","lavanderia", bogota$description)
+bogota$description <- gsub("lavandera","lavanderia", bogota$description)
+bogota$description <- gsub("lavado", "lavanderia", bogota$description)
+
+
+bg_1 <- bogota %>%
+  unnest_tokens(output = word, input = description) %>% 
+  anti_join(get_stopwords("es"), "word")
+
+bg %>% count(word, sort = TRUE) %>% tail(100)
+
+
+
+bg_1 %>% count(price, word) %>% head(20)
+bg_1 %>% count(word, sort = T) %>% head(20)
+
+top_words <- bg_1 %>%
+  count(word, sort = TRUE) %>%
+  filter(!word %in% as.character(0:10)) %>%
+  slice_max(n, n = 100) %>%
+  pull(word)
+
+top_words  
+
+subset(bogota,property_id=="4f9c293c90181d1fb5850094")$description
+
+x<- bg[bg$word=="dos",]
+
+
+
 
 
 p1_test <- test
