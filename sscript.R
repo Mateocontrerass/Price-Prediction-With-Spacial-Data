@@ -45,9 +45,8 @@ p_load(mltools, xgboost,
        mlr,
        install = T)
 
-#library(mlr3)
 
-
+#Set seed
 set.seed(666)
 
 
