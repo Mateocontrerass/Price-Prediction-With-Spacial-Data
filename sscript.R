@@ -40,7 +40,7 @@ p_load(glue,
 
 p_load(mltools, xgboost,
        mixgb, vctrs,
-       mlr,
+       mlr, spdep,
        install = T)
 
 
@@ -566,8 +566,6 @@ leaflet() %>% addTiles() %>%
   addCircles(data=new_house)
 
 new_house_sp <- new_house %>% st_buffer(20) %>% as_Spatial()
-install.packages("spdep")
-library(spdep)
 nb_house = poly2nb(pl=new_house_sp , queen=T) # opcion reina
 nb_house[[32]]
 
@@ -595,7 +593,7 @@ vacio <- c("\n", "<", ">", "br", "&", "tilde", "/", " n ", ",",
            "amplia")
 
 remodelada <- c("nuevo", "nueva", "remodelado", "estrenar", "construida",
-                "re modelada")
+                "re modelada", "remodeladas")
 
 bano <- c("bao", "banos", "baos", "ano", "anos", "bbano", " ba ")
 
@@ -727,6 +725,7 @@ df$description <- gsub("saln", "salon", df$description)
 df$description <- gsub("tres","3",df$description)
 df$description <- gsub("cinco","5",df$description)
 df$description <- gsub(" dos","2",df$description)
+df$description <- gsub(" un ", "1",df$description)
 df$description <- gsub("doss","2",df$description)
 df$description <- gsub("cuatro","4",df$description)
 df$description <- gsub("cuastro","4",df$description)
@@ -751,20 +750,19 @@ top_words <- bg %>%
 
 top_words  
 
-subset(df,property_id=="d4c69c227b4cc8a3069e7dd3")$description
-
-x<- bg[bg$word=="ba",]
+#subset(df,property_id=="d4c69c227b4cc8a3069e7dd3")$description
+#x<- bg[bg$word=="ba",]
 
 words <- c("apartamento", "parqueadero", "lavanderia", "terraza",
              "remodelada", "ascensor", "vigilancia", "iluminacion", "piscina")
 
+words <- glue_collapse(words, sep = "|")
+
 
 db_recipe <- recipe(formula=price ~ . , data=df) %>% ## En recip se detallan los pasos que se aplicarán a un conjunto de datos para prepararlo para el análisis de datos.
-  update_role(property_id, new_role = "id") %>% ## cambiar role para variable id
-  step_regex(description, pattern = c("apartamento", "parqueadero", "lavanderia", "terraza",
-                                      "remodelada", "ascensor", "vigilancia", "iluminacion", "piscina")   , result="") %>% ## generar dummy
-  step_rm(description) %>% ## remover description 
-  step_dummy(all_nominal_predictors()) %>%
+  update_role(property_id, new_role = "property_id") %>% ## cambiar role para variable id
+  update_role(description, new_role = "description") %>% ## cambiar role para variable id
+  step_regex(description, pattern = words, result="dummy") %>% ## generar dummy
   step_nzv(all_predictors())
 db_recipe
 
@@ -797,25 +795,71 @@ str_locate_all(string = house$description[49] , pattern = x) ## detect pattern
   #Baño
 
 #Este me cuenta cada vez que haya una palabra de baño solita
-df$bano <- str_count(string=df$description , pattern = "bano" )  
+df$bano <- str_count(string=df$description , pattern = "[:blank:]+bano+[:blank:]" )  
 
-if (is.na(df$bathrooms==T)){
-  df$bathrooms=df$bano
+x <- "[:alnum:]+[:blank:]+bano"
+
+df$nuevos_banos <- str_extract(string=df$description, pattern = x) 
+df$nuevos_banos <- gsub("bano","",df$nuevos_baños)
+
+df$hab <- gsub("habitaciones","bano",df$nuevos_baños)
+
+for (i in 1:51437){
+  if (is.na(df$bathrooms[i])==T){
+    
+    df$bathrooms[i]=df$bano[i]
+  }
 }
 
-## hacer algo similar para rooms (habitaciones) y para metros2 (m2)
+for (i in 1:51437){
+  if (df$new==T){
+    
+    df$bathrooms[i]=df$bano[i]
+  }
+}
 
 
+
+## Esto es para habitaciones
+
+x <- "[:alnum:]+[:blank:]+habitacion"
+y <- "[:alnum:]+habitacion[:alnum:]"
+c <- "[:alnum:]+[:blank:]+habitaciones"
+d <- "[:alnum:]+habitaciones"
+
+df$new_habs <- str_extract(string=df$description, pattern = x) 
+df$new_habs1 <- str_extract(string=df$description, pattern = y)
+df$new_habs2 <- str_extract(string=df$description, pattern = c)
+df$new_habs3 <- str_extract(string=df$description, pattern = d)
+
+table(df$new_habs)
+table(df$new_habs1)
+table(df$new_habs2)
+table(df$new_habs3)
+
+for (i in 1:51437){
+  if (nuevo_baño=="habitacion"){
+    
+    df$bathrooms[i]=df$bano[i]
+  }
+}
+
+
+  
 #Cuando la palabra es bañoS, este me agarra la palabra que estaba antes
 
-x <- "[:alnum:]+[:blank:]+baños"
+x <- "[:alnum:]+[:blank:]+bano"
 
-train$nuevos_baños <- str_extract(string=train$description, pattern = x) 
+df$nuevos_banos <- str_extract(string=df$description, pattern = x) 
 
 
-train$nuevos_baños <- gsub("baños","",train$nuevos_baños)
+df$nuevos_banos <- gsub("bano","",df$nuevos_baños)
     
+df$hab <- gsub("habitaciones","bano",df$nuevos_baños)
 
+top_words
+
+table(df$nuevos_baños)
 
 train$nuevos_baños <- gsub("tres","3",train$nuevos_baños)
 train$nuevos_baños <- gsub("cinco","5",train$nuevos_baños)
