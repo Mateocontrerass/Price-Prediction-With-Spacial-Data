@@ -769,8 +769,31 @@ db_recipe <- recipe(formula=price ~ . , data=df) %>% ## En recip se detallan los
 db_recipe
 
 
+
 ### Regex baño
 
+x1 <- "[:space:]+[:digit:]+[:space:]+"
+x2 <- "[:space:]+[:digit:]+[:punct:]+[:digit:]+[:space:]+"
+x3 <- "[:digit:]+[:space:]+"
+x4 <- "[:digit:]+"
+train$area <- NA
+
+
+## replace values
+x5 <- "terraza + [:space:] + de + [:space:] + [:digit:] + [:space:]+"
+x6 <- "terraza + [:space:] +[:alpha:]+ [:space:]+ de + [:space:] + [:digit:] + [:space:]+"
+
+for (i in c("mts","m2","mt2","mts2","metros","cuadrad","mtro","mtr2")){
+  train <- train %>% 
+    mutate(area = ifelse(is.na(area)==T,str_extract(string=description , pattern=paste0(x1,i)),area),
+           area = ifelse(is.na(area)==T,str_extract(string=description , pattern=paste0(x2,i)),area),
+           area = ifelse(is.na(area)==T,str_extract(string=description , pattern=paste0(x3,i)),area),
+           area = ifelse(is.na(area)==T,str_extract(string=description , pattern=paste0(x4,i)),area),
+    )
+}
+table(is.na(train$area))
+
+str_locate_all(string = house$description[49] , pattern = x) ## detect pattern
   #Baño
 
 #Este me cuenta cada vez que haya una palabra de baño solita
