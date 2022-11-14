@@ -570,17 +570,11 @@ nb_house = poly2nb(pl=new_house_sp , queen=T) # opcion reina
 nb_house[[32]]
 
 
-## Medellin
-
-df_medellin <- read.csv("data/catastro_repositorio2_gdb.csv", header = T,
-                        sep = ",")
-
-
 #------------------------------------------------------------------------------
-####Regex
+####Regex train
 
-df<-read_csv2("data/train_final.csv") %>%
-  select(-1) %>% mutate(description=str_to_lower(description),
+train<-read_csv2("data/train_final.csv") %>%
+  select(-1, -dist_cafe...16,-dist_cafe...17) %>% mutate(description=str_to_lower(description),
                         description=stri_trans_general(str = description, id = "Latin-ASCII"))
 
 
@@ -620,7 +614,7 @@ for (i in palabras){
   if (i =="vacio"){
     for (j in vacio){
       
-      df$description <- gsub(j, " ", df$description)
+      train$description <- gsub(j, " ", train$description)
       term<-paste0("Terminado ", j)
       print(term)
       
@@ -630,7 +624,7 @@ for (i in palabras){
   else if (i=="remodelada"){
     for (j in remodelada){
       
-      df$description <- gsub(j, "remodelada", df$description)
+      train$description <- gsub(j, "remodelada", train$description)
       term<-paste0("Terminado ", j)
       print(term)
       
@@ -640,7 +634,7 @@ for (i in palabras){
   else if (i=="bano"){
     for (j in bano){
       
-      df$description <- gsub(j, "bano", df$description)
+      train$description <- gsub(j, "bano", train$description)
       term<-paste0("Terminado ", j)
       print(term)
       
@@ -650,7 +644,7 @@ for (i in palabras){
   else if (i=="parqueadero"){
     for (j in parqueadero){
       
-      df$description <- gsub(j, "parqueadero", df$description)
+      train$description <- gsub(j, "parqueadero", train$description)
       term<-paste0("Terminado ", j)
       print(term)
       
@@ -660,7 +654,7 @@ for (i in palabras){
   else if (i=="terraza"){
     for (j in terraza){
       
-      df$description <- gsub(j, "terraza", df$description)
+      train$description <- gsub(j, "terraza", train$description)
       term<-paste0("Terminado ", j)
       print(term)
       
@@ -670,7 +664,7 @@ for (i in palabras){
   else if (i=="vigilancia"){
     for (j in vigilancia){
       
-      df$description <- gsub(j, "vigilancia", df$description)
+      train$description <- gsub(j, "vigilancia", train$description)
       term<-paste0("Terminado ", j)
       print(term)
       
@@ -680,7 +674,7 @@ for (i in palabras){
   else if (i=="m2"){
     for (j in m2){
       
-      df$description <- gsub(j, "m2", df$description)
+      train$description <- gsub(j, "m2", train$description)
       term<-paste0("Terminado ", j)
       print(term)
       
@@ -690,7 +684,7 @@ for (i in palabras){
   else if (i=="lavanderia"){
     for (j in lavanderia){
       
-      df$description <- gsub(j, "lavanderia", df$description)
+      train$description <- gsub(j, "lavanderia", train$description)
       term<-paste0("Terminado ", j)
       print(term)
       
@@ -700,7 +694,7 @@ for (i in palabras){
   else if (i=="habitaciones"){
     for (j in habitaciones){
       
-      df$description <- gsub(j, "habitaciones", df$description)
+      train$description <- gsub(j, "habitaciones", train$description)
       term<-paste0("Terminado ", j)
       print(term)
       
@@ -710,7 +704,7 @@ for (i in palabras){
   else if (i=="iluminacion"){
     for (j in iluminacion){
       
-      df$description <- gsub(j, "iluminacion", df$description)
+      train$description <- gsub(j, "iluminacion", train$description)
       term<-paste0("Terminado ", j)
       print(term)
       
@@ -718,98 +712,98 @@ for (i in palabras){
   }
 }
 
-df$description <- gsub("apto","apartamento", df$description)
-df$description <- gsub("independientes", "independiente", df$description)
-df$description <- gsub("ascensores", "ascensor", df$description)
-df$description <- gsub("saln", "salon", df$description)
-df$description <- gsub("tres","3",df$description)
-df$description <- gsub("cinco","5",df$description)
-df$description <- gsub(" dos","2",df$description)
-df$description <- gsub(" un ", "1",df$description)
-df$description <- gsub("doss","2",df$description)
-df$description <- gsub("cuatro","4",df$description)
-df$description <- gsub("cuastro","4",df$description)
-df$description <- gsub("seis","6",df$description)
-df$description <- gsub("doas","2",df$description)
-df$description <- gsub(" s ", " ", df$description)
-df$description <- gsub(" n ", " ", df$description)
-df$description <- gsub(" b ", " ", df$description)
+train$description <- gsub("apto","apartamento", train$description)
+train$description <- gsub("independientes", "independiente", train$description)
+train$description <- gsub("ascensores", "ascensor", train$description)
+train$description <- gsub("saln", "salon", train$description)
+train$description <- gsub("tres","3",train$description)
+train$description <- gsub("cinco","5",train$description)
+train$description <- gsub(" dos","2",train$description)
+train$description <- gsub(" un ", "1",train$description)
+train$description <- gsub("doss","2",train$description)
+train$description <- gsub("cuatro","4",train$description)
+train$description <- gsub("cuastro","4",train$description)
+train$description <- gsub("seis","6",train$description)
+train$description <- gsub("doas","2",train$description)
+train$description <- gsub(" s ", " ", train$description)
+train$description <- gsub(" n ", " ", train$description)
+train$description <- gsub(" b ", " ", train$description)
 
   # surface_total (toma valores de terraza tambien)
 
 x1 <- "[:space:]+[:digit:]+[:space:]+"
 
-df <- df %>% 
+train <- train %>% 
   mutate(surface_total = ifelse(is.na(surface_total)==T,str_extract(string=description , pattern=paste0(x1,m2)),surface_total))
 
-df$surface_covered <- as.numeric(df$surface_covered)
+train$surface_covered <- as.numeric(train$surface_covered)
 
 for (i in 1:51437){
-  if (is.na(df$surface_covered[i])==F){
-    df$surface_total[i]=df$surface_covered[i]
+  if (is.na(train$surface_covered[i])==F){
+    train$surface_total[i]=train$surface_covered[i]
   }
 }
 
-table(is.na(df$surface_total))
+table(is.na(train$surface_total))
 
   #Baño
 
 #Este me cuenta cada vez que haya una palabra de baño solita
-df$bano <- str_count(string=df$description , pattern = "[:blank:]+bano+[:blank:]" )  
+train$bano <- str_count(string=train$description , pattern = "[:blank:]+bano+[:blank:]" )  
 
 x <- "[:alnum:]+bano"
 
-df$nuevos_banos <- str_extract(string=df$description, pattern = x) 
-df$nuevos_banos <- gsub("bano","",df$nuevos_banos)
+train$nuevos_banos <- str_extract(string=train$description, pattern = x) 
+train$nuevos_banos <- gsub("bano","",train$nuevos_banos)
 
-df$hab <- gsub("habitaciones","bano",df$nuevos_banos)
+train$hab <- gsub("habitaciones","bano",train$nuevos_banos)
 
-df$nuevos_banos <- as.numeric(df$nuevos_banos)
+train$nuevos_banos <- as.numeric(train$nuevos_banos)
 
 for (i in 1:51437){
-  if (is.na(df$nuevos_banos[i])==F){
-    df$bano[i]=df$nuevos_banos[i]
+  if (is.na(train$nuevos_banos[i])==F){
+    train$bano[i]=train$nuevos_banos[i]
   }
 }
 
 for (i in 1:51437){
-  if (is.na(df$hab[i]=="bano")==T){
-    df$bano[i]=df$rooms[i]
+  if (is.na(train$hab[i]=="bano")==T){
+    train$bano[i]=train$rooms[i]
   }
 }
 
 for (i in 1:51437){
-  if (is.na(df$bathrooms[i])==T){
-    df$bathrooms[i]=df$bano[i]
+  if (is.na(train$bathrooms[i])==T){
+    train$bathrooms[i]=train$bano[i]
   }
 }
 
 for (i in 1:51437){
-  if (is.na(df$bathrooms[i])==T){
-    df$bathrooms[i]=0
+  if (is.na(train$bathrooms[i])==T){
+    train$bathrooms[i]=0
   }
 }
 
-table(is.na(df$bathrooms))
+table(is.na(train$bathrooms))
 
-df <- subset(df, select = -c(surface_covered, bedrooms, nuevos_banos, hab, bano))
+train <- subset(train, select = -c(surface_covered, bedrooms, nuevos_banos, hab, bano))
 
 ### Palabras con más incidencia
 
-bg <- df %>%
+bg_train <- train %>%
   unnest_tokens(output = word, input = description) %>% 
   anti_join(get_stopwords("es"), "word")
 
 
-bg %>% count(word, sort = TRUE) %>% print(n=100)
+bg_train %>% count(word, sort = TRUE) %>% print(n=100)
 
-top_words <- bg %>%
+top_words_train <- bg %>%
   count(word, sort = TRUE) %>%
   filter(!word %in% as.character(0:10)) %>%
   slice_max(n, n = 100) %>%
   pull(word)
 
-top_words  
+top_words_train
 
 #subset(df,property_id=="d4c69c227b4cc8a3069e7dd3")$description
 #x<- bg[bg$word=="ba",]
@@ -820,15 +814,230 @@ words <- c("apartamento", "parqueadero", "lavanderia", "terraza", "integral",
 words <- glue_collapse(words, sep = "|")
 
 
-db_recipe <- recipe(formula=price ~ . , data=df) %>% ## En recip se detallan los pasos que se aplicarán a un conjunto de datos para prepararlo para el análisis de datos.
+# Partir base train (train y evaluate)
+
+prop.table(table(train$city))
+
+split<-rsample::initial_split(train,prop=0.8,strata=city)
+
+training_set<-rsample::training(split)
+evaluating_set<-rsample::testing(split)
+
+prop.table(table(training_set$city))
+
+
+#Dejar geometria training
+training_set <- st_drop_geometry(training_set)
+
+evaluating_set <- st_drop_geometry(evaluating_set)
+
+
+## recipe para trainning
+
+train_recipe <- recipe(formula=price ~ . , data=training_set) %>% ## En recip se detallan los pasos que se aplicarán a un conjunto de datos para prepararlo para el análisis de datos.
   update_role(property_id, new_role = "property_id") %>% ## cambiar role para variable id
-  update_role(description, new_role = "description") %>% ## cambiar role para variable id
   step_regex(description, pattern = words, result="dummy") %>% ## generar dummy
+  step_rm(description, operation_type) %>%
+  step_dummy(city, property_type) %>%
   step_nzv(all_predictors())
-db_recipe
+train_recipe
+
+rm(bg_train)
 
 
-#------------------------------------------------------------------------------
+
+
+
+#-------------------------------------------------------------------------------
+
+####Regex test
+
+test<-read_csv2("data/cali_final.csv") %>%
+  select(-1, -dist_cafe) %>% mutate(description=str_to_lower(description),
+                        description=stri_trans_general(str = description, id = "Latin-ASCII"))
+
+for (i in palabras){
+  if (i =="vacio"){
+    for (j in vacio){
+      
+      test$description <- gsub(j, " ", test$description)
+      term<-paste0("Terminado ", j)
+      print(term)
+      
+    }
+  }
+  
+  else if (i=="remodelada"){
+    for (j in remodelada){
+      
+      test$description <- gsub(j, "remodelada", test$description)
+      term<-paste0("Terminado ", j)
+      print(term)
+      
+    }
+  }
+  
+  else if (i=="bano"){
+    for (j in bano){
+      
+      test$description <- gsub(j, "bano", test$description)
+      term<-paste0("Terminado ", j)
+      print(term)
+      
+    }
+  }
+  
+  else if (i=="parqueadero"){
+    for (j in parqueadero){
+      
+      test$description <- gsub(j, "parqueadero", test$description)
+      term<-paste0("Terminado ", j)
+      print(term)
+      
+    }
+  }
+  
+  else if (i=="terraza"){
+    for (j in terraza){
+      
+      test$description <- gsub(j, "terraza", test$description)
+      term<-paste0("Terminado ", j)
+      print(term)
+      
+    }
+  }
+  
+  else if (i=="vigilancia"){
+    for (j in vigilancia){
+      
+      test$description <- gsub(j, "vigilancia", test$description)
+      term<-paste0("Terminado ", j)
+      print(term)
+      
+    }
+  }
+  
+  else if (i=="m2"){
+    for (j in m2){
+      
+      test$description <- gsub(j, "m2", test$description)
+      term<-paste0("Terminado ", j)
+      print(term)
+      
+    }
+  }
+  
+  else if (i=="lavanderia"){
+    for (j in lavanderia){
+      
+      test$description <- gsub(j, "lavanderia", test$description)
+      term<-paste0("Terminado ", j)
+      print(term)
+      
+    }
+  }
+  
+  else if (i=="habitaciones"){
+    for (j in habitaciones){
+      
+      test$description <- gsub(j, "habitaciones", test$description)
+      term<-paste0("Terminado ", j)
+      print(term)
+      
+    }
+  }
+  
+  else if (i=="iluminacion"){
+    for (j in iluminacion){
+      
+      test$description <- gsub(j, "iluminacion", test$description)
+      term<-paste0("Terminado ", j)
+      print(term)
+      
+    }
+  }
+}
+
+test$description <- gsub("apto","apartamento", test$description)
+test$description <- gsub("independientes", "independiente", test$description)
+test$description <- gsub("ascensores", "ascensor", test$description)
+test$description <- gsub("saln", "salon", test$description)
+test$description <- gsub("tres","3",test$description)
+test$description <- gsub("cinco","5",test$description)
+test$description <- gsub(" dos","2",test$description)
+test$description <- gsub(" un ", "1",test$description)
+test$description <- gsub("doss","2",test$description)
+test$description <- gsub("cuatro","4",test$description)
+test$description <- gsub("cuastro","4",test$description)
+test$description <- gsub("seis","6",test$description)
+test$description <- gsub("doas","2",test$description)
+test$description <- gsub(" s ", " ", test$description)
+test$description <- gsub(" n ", " ", test$description)
+test$description <- gsub(" b ", " ", test$description)
+
+# surface_total (toma valores de terraza tambien)
+
+test <- test %>% 
+  mutate(surface_total = ifelse(is.na(surface_total)==T,str_extract(string=description , pattern=paste0(x1,m2)),surface_total))
+
+test$surface_covered <- as.numeric(test$surface_covered)
+
+for (i in 1:5000){
+  if (is.na(test$surface_covered[i])==F){
+    test$surface_total[i]=test$surface_covered[i]
+  }
+}
+
+table(is.na(test$surface_total))
+
+#Baño
+
+#Este me cuenta cada vez que haya una palabra de baño solita
+
+test$bano <- str_count(string=test$description , pattern = "[:blank:]+bano+[:blank:]" )  
+
+x <- "[:alnum:]+bano"
+
+test$nuevos_banos <- str_extract(string=test$description, pattern = x) 
+test$nuevos_banos <- gsub("bano","",test$nuevos_banos)
+
+test$hab <- gsub("habitaciones","bano",test$nuevos_banos)
+
+test$nuevos_banos <- as.numeric(test$nuevos_banos)
+
+for (i in 1:5000){
+  if (is.na(test$nuevos_banos[i])==F){
+    test$bano[i]=test$nuevos_banos[i]
+  }
+}
+
+for (i in 1:5000){
+  if (is.na(test$hab[i]=="bano")==T){
+    test$bano[i]=test$rooms[i]
+  }
+}
+
+for (i in 1:5000){
+  if (is.na(test$bathrooms[i])==T){
+    test$bathrooms[i]=test$bano[i]
+  }
+}
+
+for (i in 1:5000){
+  if (is.na(test$bathrooms[i])==T){
+    test$bathrooms[i]=0
+  }
+}
+
+table(is.na(test$bathrooms))
+
+test <- subset(test, select = -c(surface_covered, bedrooms, nuevos_banos, hab, bano))
+
+#Dejar geometria
+test <- st_drop_geometry(test)
+
+#-------------------------------------------------------------------------------
+
 
 # Preparación de la base para el modelo
 
@@ -836,13 +1045,12 @@ db_recipe
 train <- subset(train,select=-c(geometry,description,title))
 test <- subset(test,select=-c(geometry,description,title))
 
-train <- select(train,-geometry)
-test  <- select(test,-geometry)
-
+#train <- select(train,-geometry)
+#test  <- select(test,-geometry)
 
 #Dejar geometria
-train <- st_drop_geometry(train)
-test <- st_drop_geometry(test)
+train_f <- st_drop_geometry(train)
+test_f <- st_drop_geometry(test)
 
 train$property_type <- as.factor(train$property_type)
 train$city          <- as.factor(train$city) 
