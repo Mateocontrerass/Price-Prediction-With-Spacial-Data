@@ -696,6 +696,9 @@ bogota$description <- gsub("/", " ", bogota$description)
 bogota$description <- gsub(" n ", " ", bogota$description)
 bogota$description <- gsub(" av ", " ", bogota$description)
 bogota$description <- gsub(";", " ", bogota$description)
+bogota$description <- gsub("mas", " ", bogota$description)
+bogota$description <- gsub("cuenta", " ", bogota$description)
+bogota$description <- gsub(" con ", " ", bogota$description)
 
 bogota$description <- gsub("nuevo", "remodelada", bogota$description)
 bogota$description <- gsub("nueva", "remodelada", bogota$description)
@@ -714,6 +717,9 @@ bogota$description <- gsub("apto","apartamento", bogota$description)
 bogota$description <- gsub("balcn","balcon", bogota$description)
 bogota$description <- gsub("balcones", "balcon", bogota$description)
 
+bogota$description <- gsub("independientes", "independiente", bogota$description)
+
+bogota$description <- gsub("24", "vigilancia", bogota$description)
 
 bogota$description <- gsub("alcobas","habitaciones", bogota$description)
 bogota$description <- gsub("habitacin", "habitaciones", bogota$description)
@@ -724,6 +730,8 @@ bogota$description <- gsub("garaje","parqueadero", bogota$description)
 bogota$description <- gsub("parqueo", "parqueadero", bogota$description)
 
 bogota$description <- gsub("terrazas", "terraza", bogota$description)
+
+bogota$description <- gsub("amplio", "amplia", bogota$description)
 
 bogota$description <- gsub("mts2","m2", bogota$description)
 bogota$description <- gsub("cuadrados","m2", bogota$description)
@@ -751,7 +759,9 @@ bg <- bogota %>%
 
 
 bg %>% count(word, sort = TRUE) %>% head(100)
-bg %>% count(price, word) %>% head(20)
+
+words <- c("apartamento", "parqueadero", "lavanderia", "social", "terraza",
+           "balcon", "remodelada", "ascensor", "vigilancia" )
 
 top_words <- bg %>%
   count(word, sort = TRUE) %>%
@@ -761,12 +771,13 @@ top_words <- bg %>%
 
 top_words  
 
-subset(bogota,property_id=="01d81171cd561cd2923b018e")$description
+subset(bogota,property_id=="640b01f1e042e6f2ae9f3593")$description
 
-x<- bg[bg$word=="br",]
+x<- bg[bg$word=="cuenta",]
 
 ## contar conmibanciones de word y price
 
+"
 count_words <- bg %>%
   count(word, price) %>%
   complete(word, price, fill = list(n = 0)) ## expandir todas las posibles combinaciones
@@ -810,6 +821,9 @@ lower_words <- word_model %>%
   filter(p.value < 0.05) %>%
   slice_max(-estimate, n = 12) %>%
   pull(word)
+"
+
+
 
 
 
