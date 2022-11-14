@@ -49,5 +49,7 @@ iii) Por ultimo, se estableció que la aproximación más sencilla frente a las 
 ## ¿Cómo replicar los resultados?
 Para replicar los resultados se sugiere clonar el repositorio entero a una carpeta de su preferencia y correr el __Script__ provisto. No hay necesidad de establecer el directorio dado que se hace automaticamente. Sin embargo, puede que se necesiten instalar algunas librerias a mano.
 
+# Representación del equipo durante el desarrollo del proyecto.
 
+![alt text]
 
