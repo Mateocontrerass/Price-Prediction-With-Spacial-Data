@@ -680,118 +680,116 @@ df_medellin <- read.csv("data/catastro_repositorio2_gdb.csv", header = T,
 #------------------------------------------------------------------------------
 #Regex
 
-bogota<-read_csv2("data/train_final.csv") %>%
+df<-read_csv2("data/train_final.csv") %>%
   select(-1) %>% mutate(description=str_to_lower(description),
                         description=stri_trans_general(str = description, id = "Latin-ASCII"))
 
 
-#bogota %>% count(price)
+df$description <- gsub("\n", " ", df$description)
+df$description <- gsub("<", " ", df$description)
+df$description <- gsub(">", " ", df$description)
+df$description <- gsub("br", " ", df$description)
+df$description <- gsub("&", " ", df$description)
+df$description <- gsub("tilde", " ", df$description)
+df$description <- gsub("/", " ", df$description)
+df$description <- gsub(" n ", " ", df$description)
+df$description <- gsub(" av ", " ", df$description)
+df$description <- gsub(";", " ", df$description)
 
-bogota$description <- gsub("\n", " ", bogota$description)
-bogota$description <- gsub("<", " ", bogota$description)
-bogota$description <- gsub(">", " ", bogota$description)
-bogota$description <- gsub("br", " ", bogota$description)
-bogota$description <- gsub("&", " ", bogota$description)
-bogota$description <- gsub("tilde", " ", bogota$description)
-bogota$description <- gsub("/", " ", bogota$description)
-bogota$description <- gsub(" n ", " ", bogota$description)
-bogota$description <- gsub(" av ", " ", bogota$description)
-bogota$description <- gsub(";", " ", bogota$description)
+df$description <- gsub("mas", " ", df$description)
+df$description <- gsub("cuenta", " ", df$description)
+df$description <- gsub(" con ", " ", df$description)
+df$description <- gsub("amplia", " ", df$description)
+df$description <- gsub("excelente", " ", df$description)
+df$description <- gsub("exceñemtes", " ", df$description)
+df$description <- gsub("principal", " ", df$description)
+df$description <- gsub("venta", " ", df$description)
+df$description <- gsub("ubicado", " ", df$description)
+df$description <- gsub("hermoso", " ", df$description)
+df$description <- gsub("calle", " ", df$description)
+df$description <- gsub("carrera", " ", df$description)
+df$description <- gsub("amplias", " ", df$description)
+df$description <- gsub("norte", " ", df$description)
+df$description <- gsub("barrio", " ", df$description)
+df$description <- gsub("espectacular", " ", df$description)
+df$description <- gsub("gran", " ", df$description)
+df$description <- gsub("ciudad", " ", df$description)
+df$description <- gsub("bogota", " ", df$description)
+df$description <- gsub("vendo", " ", df$description)
+df$description <- gsub("buena", " ", df$description)
+df$description <- gsub("informaion", " ", df$description)
+df$description <- gsub("cerca", " ", df$description)
 
-bogota$description <- gsub("mas", " ", bogota$description)
-bogota$description <- gsub("cuenta", " ", bogota$description)
-bogota$description <- gsub(" con ", " ", bogota$description)
-bogota$description <- gsub("amplia", " ", bogota$description)
-bogota$description <- gsub("excelente", " ", bogota$description)
-bogota$description <- gsub("exceñemtes", " ", bogota$description)
-bogota$description <- gsub("principal", " ", bogota$description)
-bogota$description <- gsub("venta", " ", bogota$description)
-bogota$description <- gsub("ubicado", " ", bogota$description)
-bogota$description <- gsub("hermoso", " ", bogota$description)
-bogota$description <- gsub("calle", " ", bogota$description)
-bogota$description <- gsub("carrera", " ", bogota$description)
-bogota$description <- gsub("amplias", " ", bogota$description)
-bogota$description <- gsub("norte", " ", bogota$description)
-bogota$description <- gsub("barrio", " ", bogota$description)
-bogota$description <- gsub("espectacular", " ", bogota$description)
-bogota$description <- gsub("gran", " ", bogota$description)
-bogota$description <- gsub("ciudad", " ", bogota$description)
-bogota$description <- gsub("bogota", " ", bogota$description)
-bogota$description <- gsub("vendo", " ", bogota$description)
-bogota$description <- gsub("buena", " ", bogota$description)
-bogota$description <- gsub("informaion", " ", bogota$description)
-bogota$description <- gsub("cerca", " ", bogota$description)
+df$description <- gsub("nuevo", "remodelada", df$description)
+df$description <- gsub("nueva", "remodelada", df$description)
+df$description <- gsub("remodelado", "remodelada", df$description)
+df$description <- gsub("estrenar", "remodelada", df$description)
+df$description <- gsub("construida", "remodelada", df$description)
+df$description <- gsub("re modelada", "remodelada", df$description)
 
-bogota$description <- gsub("nuevo", "remodelada", bogota$description)
-bogota$description <- gsub("nueva", "remodelada", bogota$description)
-bogota$description <- gsub("remodelado", "remodelada", bogota$description)
-bogota$description <- gsub("estrenar", "remodelada", bogota$description)
-bogota$description <- gsub("construida", "remodelada", bogota$description)
-bogota$description <- gsub("re modelada", "remodelada", bogota$description)
+df$description <- gsub("bao","bano", df$description)
+df$description <- gsub("baño","bano", df$description)
+df$description <- gsub("banos","bano", df$description)
+df$description <- gsub("baos","bano", df$description)
+df$description <- gsub("anos","bano", df$description)
 
-bogota$description <- gsub("bao","bano", bogota$description)
-bogota$description <- gsub("baño","bano", bogota$description)
-bogota$description <- gsub("banos","bano", bogota$description)
-bogota$description <- gsub("baos","bano", bogota$description)
-bogota$description <- gsub("anos","bano", bogota$description)
+df$description <- gsub("apto","apartamento", df$description)
 
-bogota$description <- gsub("apto","apartamento", bogota$description)
+df$description <- gsub("balcn","balcon", df$description)
+df$description <- gsub("balcones", "balcon", df$description)
 
-bogota$description <- gsub("balcn","balcon", bogota$description)
-bogota$description <- gsub("balcones", "balcon", bogota$description)
+df$description <- gsub("independientes", "independiente", df$description)
 
-bogota$description <- gsub("independientes", "independiente", bogota$description)
+df$description <- gsub("24", "vigilancia", df$description)
+df$description <- gsub("conjunto", "vigilancia", df$description)
 
-bogota$description <- gsub("24", "vigilancia", bogota$description)
-bogota$description <- gsub("conjunto", "vigilancia", bogota$description)
+df$description <- gsub("alcobas","habitaciones", df$description)
+df$description <- gsub("habitacin", "habitaciones", df$description)
 
-bogota$description <- gsub("alcobas","habitaciones", bogota$description)
-bogota$description <- gsub("habitacin", "habitaciones", bogota$description)
-
-bogota$description <- gsub("parqueaderos","parqueadero", bogota$description)
-bogota$description <- gsub("garajes","parqueadero", bogota$description)
-bogota$description <- gsub("garaje","parqueadero", bogota$description)
-bogota$description <- gsub("parqueo", "parqueadero", bogota$description)
-bogota$description <- gsub("2parqueadero", "parqueadero", bogota$description)
-bogota$description <- gsub("y2parqueadero", "parqueadero", bogota$description)
+df$description <- gsub("parqueaderos","parqueadero", df$description)
+df$description <- gsub("garajes","parqueadero", df$description)
+df$description <- gsub("garaje","parqueadero", df$description)
+df$description <- gsub("parqueo", "parqueadero", df$description)
+df$description <- gsub("2parqueadero", "parqueadero", df$description)
+df$description <- gsub("y2parqueadero", "parqueadero", df$description)
 
 
-bogota$description <- gsub("terrazas", "terraza", bogota$description)
-bogota$description <- gsub("balcon", "terraza", bogota$description)
+df$description <- gsub("terrazas", "terraza", df$description)
+df$description <- gsub("balcon", "terraza", df$description)
 
-bogota$description <- gsub("amplio", "amplia", bogota$description)
+df$description <- gsub("amplio", "amplia", df$description)
 
-bogota$description <- gsub("mts2","m2", bogota$description)
-bogota$description <- gsub("cuadrados","m2", bogota$description)
-bogota$description <- gsub("mt2", "m2", bogota$description)
-bogota$description <- gsub("metros","m2", bogota$description)
-bogota$description <- gsub("mts","m2", bogota$description)
+df$description <- gsub("mts2","m2", df$description)
+df$description <- gsub("cuadrados","m2", df$description)
+df$description <- gsub("mt2", "m2", df$description)
+df$description <- gsub("metros","m2", df$description)
+df$description <- gsub("mts","m2", df$description)
 
-bogota$description <- gsub("ascensores", "ascensor", bogota$description)
+df$description <- gsub("ascensores", "ascensor", df$description)
 
-bogota$description <- gsub("ropas","lavanderia", bogota$description)
-bogota$description <- gsub("lavandera","lavanderia", bogota$description)
-bogota$description <- gsub("lavado", "lavanderia", bogota$description)
+df$description <- gsub("ropas","lavanderia", df$description)
+df$description <- gsub("lavandera","lavanderia", df$description)
+df$description <- gsub("lavado", "lavanderia", df$description)
 
-bogota$description <- gsub("iluminado", "iluminacion", bogota$description)
-bogota$description <- gsub("luz", "iluminacion", bogota$description)
+df$description <- gsub("iluminado", "iluminacion", df$description)
+df$description <- gsub("luz", "iluminacion", df$description)
 
-bogota$description <- gsub("saln", "salon", bogota$description)
+df$description <- gsub("saln", "salon", df$description)
 
-bogota$description <- gsub("tres","3",bogota$description)
-bogota$description <- gsub("cinco","5",bogota$description)
-bogota$description <- gsub(" dos ","2",bogota$description)
-bogota$description <- gsub("doss","2",bogota$description)
-bogota$description <- gsub("cuatro","4",bogota$description)
-bogota$description <- gsub("cuastro","4",bogota$description)
-bogota$description <- gsub("seis","6",bogota$description)
-bogota$description <- gsub("doas","2",bogota$description)
+df$description <- gsub("tres","3",df$description)
+df$description <- gsub("cinco","5",df$description)
+df$description <- gsub(" dos ","2",df$description)
+df$description <- gsub("doss","2",df$description)
+df$description <- gsub("cuatro","4",df$description)
+df$description <- gsub("cuastro","4",df$description)
+df$description <- gsub("seis","6",df$description)
+df$description <- gsub("doas","2",df$description)
 
-bogota$description <- gsub(" s ", " ", bogota$description)
-bogota$description <- gsub(" n ", " ", bogota$description)
-bogota$description <- gsub(" b ", " ", bogota$description)
+df$description <- gsub(" s ", " ", df$description)
+df$description <- gsub(" n ", " ", df$description)
+df$description <- gsub(" b ", " ", df$description)
 
-bg <- bogota %>%
+bg <- df %>%
   unnest_tokens(output = word, input = description) %>% 
   anti_join(get_stopwords("es"), "word")
 
@@ -806,48 +804,23 @@ top_words <- bg %>%
 
 top_words  
 
-subset(bogota,property_id=="c2ebfdda5d4614bb8379b3cc")$description
+subset(df,property_id=="c2ebfdda5d4614bb8379b3cc")$description
 
 x<- bg[bg$word=="s",]
 
-words <- c("apartamento", "parqueadero", "lavanderia", "social", "terraza",
-           "remodelada", "ascensor", "vigilancia", "iluminacion")
+  words <- c("apartamento", "parqueadero", "lavanderia", "social", "terraza",
+             "remodelada", "ascensor", "vigilancia", "iluminacion")
 
 
 #area de lote de doscientos un m2 ########## revisar esto cuando sacar area
-subset(bogota,property_id=="c2ebfdda5d4614bb8379b3cc")$description
+subset(df,property_id=="c2ebfdda5d4614bb8379b3cc")$description
 
 x<- bg[bg$word=="s",]
 
 
-
-
-p1_test <- test
-p1_train <- train
-
-skim(train)
-head(train$surface_total, n = 16L)
-
-# Reducir a minuscula
-train$description<- str_to_lower(string=train$description)
-
-# Quitar caracteres inncesarios
-
-train$description <- gsub("\n", " ", train$description)
-
 ### Remodelada
 
-train$description <- gsub("nuevo", "remodelada", train$description)
-train$description <- gsub("nueva", "remodelada", train$description)
-train$description <- gsub("remodelado", "remodelada", train$description)
-train$description <- gsub("estrenar", "remodelada", train$description)
-
-train$remodelada <- str_count(string=train$description , pattern = "remodelada[:blank:]" )  
-
-skim(train$remodelada)
-
-train$remodelada
-
+train$remodelada <- str_count(string=train$description , pattern = "remodelada[:blank:]" )
 
 
 ### Regex baño
