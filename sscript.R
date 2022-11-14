@@ -36,18 +36,24 @@ p_load(tidyverse,
 install.packages("mltools")
 library(mltools)
 library(xgboost)
+p_load(glue,
+       hexbin, # genera un grafico de exagonos
+       patchwork,vip, ## plot: 
+       ggrepel, ## plot: geom_text_repel
+       stringi,tidytext,stopwords, ## text-data
+       tidymodels,finetune) 
 
-#install.packages("mixgb")
-#install.packages("vctrs")
-#install.packages("mlr")
+p_load(mltools, xgboost,
+       mixgb, vctrs,
+       mlr,
+       install = T)
+
+install.packages("mixgb")
+install.packages("vctrs")
+install.packages("mlr")
 #install.packages("mlr3")
 
-library(vctrs)
-library(mixgb)
-library(mlr)
-#library(mlr3)
-
-
+#Set seed
 set.seed(666)
 
 
