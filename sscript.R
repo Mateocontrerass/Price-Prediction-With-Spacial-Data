@@ -48,10 +48,6 @@ p_load(mltools, xgboost,
        mlr,
        install = T)
 
-install.packages("mixgb")
-install.packages("vctrs")
-install.packages("mlr")
-#install.packages("mlr3")
 
 #Set seed
 set.seed(666)
@@ -299,16 +295,6 @@ for (i in features){
 toc()
 
 
-#write.csv(x = bogota, file = "bogota_1.0.csv", sep = ",",
-#row.names = T, col.names = TRUE)
-
-#df <- read.csv("bogota_1.0.csv", header = T, sep = ",")
-
-
-
-#prueba<-read.csv("bogota_1.0.csv")
-
-
 #------------------------------------------------------------------------------
 #Medellin
 
@@ -424,9 +410,6 @@ toc()
 write.csv2(x=medellin, file="data/medellin_final.csv")
 write.csv2(x=bogota, file="data/bogota_final.csv")
 
-
-#hola<-read_csv2(file="data/medellin_final.csv")
-
 #------------------------------------------------------------------------------
 #Pa cali (Bien)
 
@@ -530,7 +513,7 @@ for (i in features){
     
     
   }
-
+}
 
 #------------------------------------------------------------------------------
 #Pegar las bases
