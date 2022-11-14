@@ -457,6 +457,7 @@ for (i in features){
     
     
   }
+
   
   else if ( i== "landuse"){
     for (j in landuse){
@@ -589,6 +590,27 @@ new_mnz <- mnz[new_house,]
 leaflet() %>% addTiles() %>%
   addPolygons(data=new_mnz,col="red") %>%
   addCircles(data=new_house)
+
+####
+prueba <- subset(train,train$city == 'Bogota')
+> prueba <- subset(train,train$city == "Bogotá D.C")
+> View(prueba)
+> View(p1_train)
+> bogota<-select(bogota, -X)
+> prueba <- subset(p1_train,train$city == "Bogotá D.C")
+> prueba <- select(prueba, c(property_id, lat, lon) )
+> View(prueba)
+> bogota_j <- merge(x=bogota,y=prueba,by="property_id")
+> bogota_sf <- st_as_sf(x = bogota_j, ## datos
+                        +                  coords=c("lon","lat"), ## coordenadas
+                        +                  crs=4326) ## CRS
+sf_use_s2(F)
+> house <- st_join(x=df_bogota , y=mnz)
+house_bogota <- st_join(x=bogota_sf , y=mnz)
+nb_house = poly2nb(pl=new_house_sp , queen=T)
+install.packages(spdep)
+library(spdep)
+nb_house = poly2nb(pl=new_house_sp , queen=T) # opcion reina
 
 
 ## Medellin
