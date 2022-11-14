@@ -30,16 +30,16 @@ El reto de construir los modelos predictivos comienza desde la carga de las base
 
 2. Modelaje
   
-  En esta sección se busca probar 5 modelos de clasificación y 5 modelos de predicción del ingreso, que al contrastarlo con la linea de pobreza (_Lp_ en la base de       datos) nos indique si la persona es pobre, y consecuentemente el hogar.
+En esta sección, simplemente encontraremos el número de iteraciones necesarias que nos reduzcan al máximo el error cuadrático medio. Esto se realiza por medio de un modelo Extreme Gradient Boost con cross validation.
 
 3. Elección del modelo con mejores metricas
   
-  Al final, se elegirá el modelo con mejores resultados predictivos sobre la base de evaluación teniendo en cuenta que las clasificaciones como FN tienen un mayor peso   que las clasificaciones de FP. Es por esto que la metrica principal a optimizar es la sensitividad.
+  Al final, se elegirá el modelo XGBoost con el número de iteraciones que minimice lo más posible el error cuadrático medio.
   
 ### Pre-procesamiento
 Algunos de las modificaciones más importantes hechas a las bases de datos son: 
 
-i) Se agregaron las bases de hogar y personas para tener dos bases de datos: una para entrenamiento y la otra para prueba.
+i) Pese a que la base train fue dividida en dos, de acuerdo a la ciudad, al final se utiliza la base de datos que une de nuevo sus datos.
 
 ii) Se imputaron las observaciones que tenian valores vacios para facilitar la implementación de los modelos predictivos. El algoritmo utilizado fue obtenido de la libreria `mixgb`que facilita el comando con el mismo nombre que ejecuta una estructura de imputación multiple basada en _XGBoost
 , boostraping y predictive mean matching_. Para más información sobre la libreria está este [repositorio.](https://github.com/agnesdeng/mixgb/blob/master/README.md)
