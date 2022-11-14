@@ -574,7 +574,7 @@ nb_house[[32]]
 ####Regex train
 
 train<-read_csv2("data/train_final.csv") %>%
-  select(-1, -dist_cafe...16,-dist_cafe...17) %>% mutate(description=str_to_lower(description),
+  select(-1, -dist_cafe...16,-dist_cafe...17, -dist_education) %>% mutate(description=str_to_lower(description),
                         description=stri_trans_general(str = description, id = "Latin-ASCII"))
 
 
@@ -858,7 +858,7 @@ rm(bg_train)
 ####Regex test
 
 test<-read_csv2("data/cali_final.csv") %>%
-  select(-1, -dist_cafe) %>% mutate(description=str_to_lower(description),
+  select(-1, -dist_cafe, -dist_education) %>% mutate(description=str_to_lower(description),
                         description=stri_trans_general(str = description, id = "Latin-ASCII"))
 
 for (i in palabras){
@@ -1036,7 +1036,7 @@ for (i in 1:5000){
 
 table(is.na(test$bathrooms))
 
-test <- subset(test, select = -c(surface_covered, bedrooms, nuevos_banos, hab, bano))
+test <- subset(test, select = -c(surface_covered, bedrooms, nuevos_banos, hab, bano, dist_education))
 
 #Dejar geometria
 test <- st_drop_geometry(test)
