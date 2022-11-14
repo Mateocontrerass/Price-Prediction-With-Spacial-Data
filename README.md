@@ -1,1 +1,3 @@
 # Price-Prediction-With-Spacial-Data
+## Motivación
+Este proyecto se desarrolla como respuesta al problem set 3 de la clase Big data y Machine Learning. La motivación del trabajo investigativo surge en la necesidad de determinar si es posible desarrollar modelos de predicción para precio del mercado innmobiliario con el reto de evitar sobreajuste en este tipo de datos y evitar que se repitan errores como el ocurrido a la empresa Zillow, errores que resultaron ser muy costosos para la empresa. Por otra parte, predecir acertadamente los precios de las viviendas en el mercado inmobiliario puede ser útil en política pública para prevenir posibles burbujas inmobiliarias y actuar antes de que sea demasiado tarde.
