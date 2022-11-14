@@ -545,23 +545,6 @@ mnz <- st_read("data/manz_shp_bogota/MANZ.shp")
 
 mnz <- st_transform(mnz, crs=4326)
 
-
-
-
-
-## unir dos conjuntos de datos basados en la geometría
-
-house <- st_join(x=df_bogota , y=mnz)
-
-
-write.csv2(x = bogota, file = "bogota_loop.csv", sep = ";",
-          row.names = F, col.names = TRUE)
-
-x<-read.csv2("bogota_loop.csv", header = T, sep = ";")
-
-
-
-
 ####
 train_f <- read_csv2("data/train_final.csv")
 bogota_f <- subset(train_f,train$city == "Bogotá D.C")
@@ -787,20 +770,16 @@ db_recipe
 
 ### Regex baño
 
-train$description <- gsub(","," ", train$description)
-
-
-#Mala escriura de baño (bao / bano)
-
-train$description <- gsub("bao","baño", train$description)
-train$description <- gsub("bano","baño", train$description)
-
-
-
   #Baño
 
 #Este me cuenta cada vez que haya una palabra de baño solita
-train$nuevos_baño <- str_count(string=train$description , pattern = "baño[:blank:]" )  
+df$bano <- str_count(string=df$description , pattern = "bano" )  
+
+if (df$bathrooms==NA){
+  df$bathrooms=df$bano
+}
+
+## hacer algo similar para rooms (habitaciones) y para metros2 (m2)
 
 
 #Cuando la palabra es bañoS, este me agarra la palabra que estaba antes
