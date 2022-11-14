@@ -593,7 +593,7 @@ vacio <- c("\n", "<", ">", "br", "&", "tilde", "/", " n ", ",",
            "amplia")
 
 remodelada <- c("nuevo", "nueva", "remodelado", "estrenar", "construida",
-                "re modelada")
+                "re modelada", "remodeladas")
 
 bano <- c("bao", "banos", "baos", "ano", "anos", "bbano", " ba ")
 
@@ -772,8 +772,14 @@ db_recipe
   #Baño
 
 #Este me cuenta cada vez que haya una palabra de baño solita
-df$bano <- str_count(string=df$description , pattern = "[:blank:]bano[:blank:]" )  
+df$bano <- str_count(string=df$description , pattern = "[:blank:]+bano+[:blank:]" )  
 
+x <- "[:alnum:]+[:blank:]+bano"
+
+df$nuevos_banos <- str_extract(string=df$description, pattern = x) 
+df$nuevos_banos <- gsub("bano","",df$nuevos_baños)
+
+df$hab <- gsub("habitaciones","bano",df$nuevos_baños)
 
 for (i in 1:51437){
   if (is.na(df$bathrooms[i])==T){
@@ -781,6 +787,40 @@ for (i in 1:51437){
     df$bathrooms[i]=df$bano[i]
   }
 }
+
+for (i in 1:51437){
+  if (df$new==T){
+    
+    df$bathrooms[i]=df$bano[i]
+  }
+}
+
+
+
+## Esto es para habitaciones
+
+x <- "[:alnum:]+[:blank:]+habitacion"
+y <- "[:alnum:]+habitacion[:alnum:]"
+c <- "[:alnum:]+[:blank:]+habitaciones"
+d <- "[:alnum:]+habitaciones"
+
+df$new_habs <- str_extract(string=df$description, pattern = x) 
+df$new_habs1 <- str_extract(string=df$description, pattern = y)
+df$new_habs2 <- str_extract(string=df$description, pattern = c)
+df$new_habs3 <- str_extract(string=df$description, pattern = d)
+
+table(df$new_habs)
+table(df$new_habs1)
+table(df$new_habs2)
+table(df$new_habs3)
+
+for (i in 1:51437){
+  if (nuevo_baño=="habitacion"){
+    
+    df$bathrooms[i]=df$bano[i]
+  }
+}
+
 
   
 #Cuando la palabra es bañoS, este me agarra la palabra que estaba antes
