@@ -40,18 +40,11 @@ p_load(glue,
        stringi,tidytext,stopwords, ## text-data
        tidymodels,finetune) 
 
-install.packages("mltools")
-library(mltools)
-library(xgboost)
+p_load(mltools, xgboost,
+       mixgb, vctrs,
+       mlr,
+       install = T)
 
-install.packages("mixgb")
-install.packages("vctrs")
-install.packages("mlr")
-#install.packages("mlr3")
-
-library(vctrs)
-library(mixgb)
-library(mlr)
 #library(mlr3)
 
 
