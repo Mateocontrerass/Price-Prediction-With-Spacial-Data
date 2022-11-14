@@ -577,7 +577,7 @@ df_medellin <- read.csv("data/catastro_repositorio2_gdb.csv", header = T,
 
 
 #------------------------------------------------------------------------------
-#Regex
+####Regex
 
 df<-read_csv2("data/train_final.csv") %>%
   select(-1) %>% mutate(description=str_to_lower(description),
@@ -608,7 +608,7 @@ m2 <- c("mts2", "cuadrados", "mt2", "metros", "mts")
 
 lavanderia <- c("ropas", "lavandera", "lavado")
 
-habitaciones <- c("alcobas", "habitacin")
+habitaciones <- c("alcobas", "habitacin", "habitacion", "habitacioneses")
 
 iluminacion <- c("iluminado", "luz")
 
@@ -735,6 +735,67 @@ df$description <- gsub(" s ", " ", df$description)
 df$description <- gsub(" n ", " ", df$description)
 df$description <- gsub(" b ", " ", df$description)
 
+  # surface_total (toma valores de terraza tambien)
+
+x1 <- "[:space:]+[:digit:]+[:space:]+"
+
+df <- df %>% 
+  mutate(surface_total = ifelse(is.na(surface_total)==T,str_extract(string=description , pattern=paste0(x1,m2)),surface_total))
+
+df$surface_covered <- as.numeric(df$surface_covered)
+
+for (i in 1:51437){
+  if (is.na(df$surface_covered[i])==F){
+    df$surface_total[i]=df$surface_covered[i]
+  }
+}
+
+table(is.na(df$surface_total))
+
+  #Baño
+
+#Este me cuenta cada vez que haya una palabra de baño solita
+df$bano <- str_count(string=df$description , pattern = "[:blank:]+bano+[:blank:]" )  
+
+x <- "[:alnum:]+bano"
+
+df$nuevos_banos <- str_extract(string=df$description, pattern = x) 
+df$nuevos_banos <- gsub("bano","",df$nuevos_banos)
+
+df$hab <- gsub("habitaciones","bano",df$nuevos_banos)
+
+df$nuevos_banos <- as.numeric(df$nuevos_banos)
+
+for (i in 1:51437){
+  if (is.na(df$nuevos_banos[i])==F){
+    df$bano[i]=df$nuevos_banos[i]
+  }
+}
+
+for (i in 1:51437){
+  if (is.na(df$hab[i]=="bano")==T){
+    df$bano[i]=df$rooms[i]
+  }
+}
+
+for (i in 1:51437){
+  if (is.na(df$bathrooms[i])==T){
+    df$bathrooms[i]=df$bano[i]
+  }
+}
+
+for (i in 1:51437){
+  if (is.na(df$bathrooms[i])==T){
+    df$bathrooms[i]=0
+  }
+}
+
+table(is.na(df$bathrooms))
+
+df <- subset(df, select = -c(surface_covered, bedrooms, nuevos_banos, hab, bano))
+
+### Palabras con más incidencia
+
 bg <- df %>%
   unnest_tokens(output = word, input = description) %>% 
   anti_join(get_stopwords("es"), "word")
@@ -753,8 +814,8 @@ top_words
 #subset(df,property_id=="d4c69c227b4cc8a3069e7dd3")$description
 #x<- bg[bg$word=="ba",]
 
-words <- c("apartamento", "parqueadero", "lavanderia", "terraza",
-             "remodelada", "ascensor", "vigilancia", "iluminacion", "piscina")
+words <- c("apartamento", "parqueadero", "lavanderia", "terraza", "integral",
+           "remodelada", "ascensor", "vigilancia", "iluminacion", "piscina")
 
 words <- glue_collapse(words, sep = "|")
 
@@ -765,196 +826,6 @@ db_recipe <- recipe(formula=price ~ . , data=df) %>% ## En recip se detallan los
   step_regex(description, pattern = words, result="dummy") %>% ## generar dummy
   step_nzv(all_predictors())
 db_recipe
-
-
-
-### Regex baño
-
-x1 <- "[:space:]+[:digit:]+[:space:]+"
-x2 <- "[:space:]+[:digit:]+[:punct:]+[:digit:]+[:space:]+"
-x3 <- "[:digit:]+[:space:]+"
-x4 <- "[:digit:]+"
-train$area <- NA
-
-
-## replace values
-x5 <- "terraza + [:space:] + de + [:space:] + [:digit:] + [:space:]+"
-x6 <- "terraza + [:space:] +[:alpha:]+ [:space:]+ de + [:space:] + [:digit:] + [:space:]+"
-
-for (i in c("mts","m2","mt2","mts2","metros","cuadrad","mtro","mtr2")){
-  train <- train %>% 
-    mutate(area = ifelse(is.na(area)==T,str_extract(string=description , pattern=paste0(x1,i)),area),
-           area = ifelse(is.na(area)==T,str_extract(string=description , pattern=paste0(x2,i)),area),
-           area = ifelse(is.na(area)==T,str_extract(string=description , pattern=paste0(x3,i)),area),
-           area = ifelse(is.na(area)==T,str_extract(string=description , pattern=paste0(x4,i)),area),
-    )
-}
-table(is.na(train$area))
-
-str_locate_all(string = house$description[49] , pattern = x) ## detect pattern
-  #Baño
-
-#Este me cuenta cada vez que haya una palabra de baño solita
-df$bano <- str_count(string=df$description , pattern = "[:blank:]+bano+[:blank:]" )  
-
-x <- "[:alnum:]+[:blank:]+bano"
-
-df$nuevos_banos <- str_extract(string=df$description, pattern = x) 
-df$nuevos_banos <- gsub("bano","",df$nuevos_baños)
-
-df$hab <- gsub("habitaciones","bano",df$nuevos_baños)
-
-for (i in 1:51437){
-  if (is.na(df$bathrooms[i])==T){
-    
-    df$bathrooms[i]=df$bano[i]
-  }
-}
-
-for (i in 1:51437){
-  if (df$new==T){
-    
-    df$bathrooms[i]=df$bano[i]
-  }
-}
-
-
-
-## Esto es para habitaciones
-
-x <- "[:alnum:]+[:blank:]+habitacion"
-y <- "[:alnum:]+habitacion[:alnum:]"
-c <- "[:alnum:]+[:blank:]+habitaciones"
-d <- "[:alnum:]+habitaciones"
-
-df$new_habs <- str_extract(string=df$description, pattern = x) 
-df$new_habs1 <- str_extract(string=df$description, pattern = y)
-df$new_habs2 <- str_extract(string=df$description, pattern = c)
-df$new_habs3 <- str_extract(string=df$description, pattern = d)
-
-table(df$new_habs)
-table(df$new_habs1)
-table(df$new_habs2)
-table(df$new_habs3)
-
-for (i in 1:51437){
-  if (nuevo_baño=="habitacion"){
-    
-    df$bathrooms[i]=df$bano[i]
-  }
-}
-
-
-  
-#Cuando la palabra es bañoS, este me agarra la palabra que estaba antes
-
-x <- "[:alnum:]+[:blank:]+bano"
-
-df$nuevos_banos <- str_extract(string=df$description, pattern = x) 
-
-
-df$nuevos_banos <- gsub("bano","",df$nuevos_baños)
-    
-df$hab <- gsub("habitaciones","bano",df$nuevos_baños)
-
-top_words
-
-table(df$nuevos_baños)
-
-train$nuevos_baños <- gsub("tres","3",train$nuevos_baños)
-train$nuevos_baños <- gsub("cinco","5",train$nuevos_baños)
-train$nuevos_baños <- gsub("dos","2",train$nuevos_baños)
-train$nuevos_baños <- gsub("doss","2",train$nuevos_baños)
-train$nuevos_baños <- gsub("cuatro","4",train$nuevos_baños)
-train$nuevos_baños <- gsub("cuastro","4",train$nuevos_baños)
-train$nuevos_baños <- gsub("seis","6",train$nuevos_baños)
-train$nuevos_baños <- gsub("doas","2",train$nuevos_baños)
-train$nuevos_baños <- gsub("balcn4","4",train$nuevos_baños)
-train$nuevos_baños <- gsub("comerdor2","2",train$nuevos_baños)
-train$nuevos_baños <- gsub("habitaciones4","4",train$nuevos_baños)
-train$nuevos_baños <- gsub("federman2","2",train$nuevos_baños)
-train$nuevos_baños <- gsub("integral3","3",train$nuevos_baños)
-train$nuevos_baños <- gsub("servicio3","3",train$nuevos_baños)
-train$nuevos_baños <- gsub("alcobas3","3",train$nuevos_baños)
-
-
-train$nuevos_baños<-str_extract(train$nuevos_baños,pattern="[:digit:]")
-train$nuevos_baños[is.na(train$nuevos_baños)] = 0
-train$nuevos_baños <- str_trim(train$nuevos_baños,side = c("both"))
-
-train$nuevos_baños <- as.numeric(train$nuevos_baños)
-
-# Este bloque sirve para imputar cuando bathrooms está vacio con nuevos baños
-# La segunda linea pone NA si la imputacion pone un 0
-train %>% mutate(bathrooms=coalesce(bathrooms,nuevos_baños))
-train %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
-
-# Esto hace lo mismo que arriba, pero si nuevos_Baños no sirve usa nuevos_baño
-train %>% mutate(bathrooms=coalesce(bathrooms,nuevos_baño))
-train %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
-
-train<-subset(train,select=-c(nuevos_baño,nuevos_baños))
-#------------------------------------------------------------------------------
-
-# Baños pa test
-
-df$new_bano<-str_count(string=df$description , pattern = "bano" )  
-
-if (is.na(df$bathrooms)==F){
-  df$new_bano=df$bathrooms
-}
-
-
-#Baño
-
-#Este me cuenta cada vez que haya una palabra de baño solita
-test$nuevos_baño <- str_count(string=test$description , pattern = "baño[:blank:]" )  
-
-
-#Cuando la palabra es bañoS, este me agarra la palabra que estaba antes
-
-x <- "[:alnum:]+[:blank:]+baños"
-
-test$nuevos_baños <- str_extract(string=test$description, pattern = x) 
-
-
-test$nuevos_baños <- gsub("baños","",test$nuevos_baños)
-
-
-
-test$nuevos_baños <- gsub("tres","3",test$nuevos_baños)
-test$nuevos_baños <- gsub("cinco","5",test$nuevos_baños)
-test$nuevos_baños <- gsub("dos","2",test$nuevos_baños)
-test$nuevos_baños <- gsub("doss","2",test$nuevos_baños)
-test$nuevos_baños <- gsub("cuatro","4",test$nuevos_baños)
-test$nuevos_baños <- gsub("cuastro","4",test$nuevos_baños)
-test$nuevos_baños <- gsub("seis","6",test$nuevos_baños)
-test$nuevos_baños <- gsub("doas","2",test$nuevos_baños)
-test$nuevos_baños <- gsub("balcn4","4",test$nuevos_baños)
-test$nuevos_baños <- gsub("comerdor2","2",test$nuevos_baños)
-test$nuevos_baños <- gsub("habitaciones4","4",test$nuevos_baños)
-test$nuevos_baños <- gsub("federman2","2",test$nuevos_baños)
-test$nuevos_baños <- gsub("integral3","3",test$nuevos_baños)
-test$nuevos_baños <- gsub("servicio3","3",test$nuevos_baños)
-test$nuevos_baños <- gsub("alcobas3","3",test$nuevos_baños)
-
-
-test$nuevos_baños<-str_extract(test$nuevos_baños,pattern="[:digit:]")
-test$nuevos_baños[is.na(test$nuevos_baños)] = 0
-test$nuevos_baños <- str_trim(test$nuevos_baños,side = c("both"))
-
-test$nuevos_baños <- as.numeric(test$nuevos_baños)
-
-# Este bloque sirve para imputar cuando bathrooms está vacio con nuevos baños
-# La segunda linea pone NA si la imputacion pone un 0
-test %>% mutate(bathrooms=coalesce(bathrooms,nuevos_baños))
-test %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
-
-# Esto hace lo mismo que arriba, pero si nuevos_Baños no sirve usa nuevos_baño
-test %>% mutate(bathrooms=coalesce(bathrooms,nuevos_baño))
-test %>% mutate(bathrooms,ifelse(bathrooms==0,NA,bathrooms))
-
-test<-subset(test,select=-c(nuevos_baño,nuevos_baños))
 
 
 #------------------------------------------------------------------------------
