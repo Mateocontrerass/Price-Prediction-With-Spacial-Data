@@ -33,13 +33,8 @@ p_load(tidyverse,
        tictoc, ##Saber cuanto demora corriendo el script
        rlang)
 
-install.packages("mltools")
-library(mltools)
-library(xgboost)
+
 p_load(glue,
-       hexbin, # genera un grafico de exagonos
-       patchwork,vip, ## plot: 
-       ggrepel, ## plot: geom_text_repel
        stringi,tidytext,stopwords, ## text-data
        tidymodels,finetune) 
 
@@ -588,7 +583,7 @@ df<-read_csv2("data/train_final.csv") %>%
                         description=stri_trans_general(str = description, id = "Latin-ASCII"))
 
 
-vacio <- c("\n", "<", ">", "br", "&", "tilde", "/", " n ",
+vacio <- c("\n", "<", ">", "br", "&", "tilde", "/", " n ", ",",
            " av ", ";", "\r", "mas", "cuenta", " con ", "amplia",
            "excelente", "excelentes", "principal", "venta", "ubicado",
            "hermoso", "calle", "carrera", "amplias", "norte", "barrio",
@@ -761,27 +756,16 @@ words <- c("apartamento", "parqueadero", "lavanderia", "terraza",
              "remodelada", "ascensor", "vigilancia", "iluminacion", "piscina")
 
 
-
-### Remodelada
-
-train$remodelada <- str_count(string=train$description , pattern = "remodelada[:blank:]" )
+db_recipe <- recipe(formula=price ~ . , data=df) %>% ## En recip se detallan los pasos que se aplicarán a un conjunto de datos para prepararlo para el análisis de datos.
+  update_role(property_id, new_role = "id") %>% ## cambiar role para variable id
+  step_regex(description, pattern=words , result="high_price_words") %>% ## generar dummy
+  step_rm(description) %>% ## remover description 
+  step_dummy(all_nominal_predictors()) %>%
+  step_nzv(all_predictors())
+db_recipe
 
 
 ### Regex baño
-
-#Pasar todo a minuscula
-
-test$description<- str_to_lower(string=test$description)
-train$description<- str_to_lower(string=train$description)
-
-
-#Dropear columna operation_type y operation_id (no dice nada)
-
-train <- subset(train, select=-c(operation_type,property_id,rooms))
-test <- subset(test, select=-c(operation_type,property_id,rooms))
-
-
-#Reemplazo la puntuación con espacios
 
 train$description <- gsub(","," ", train$description)
 
@@ -847,17 +831,11 @@ train<-subset(train,select=-c(nuevos_baño,nuevos_baños))
 
 # Baños pa test
 
+df$new_bano<-str_count(string=df$description , pattern = "bano" )  
 
-#Reemplazo la puntuación con espacios
-
-test$description <- gsub(","," ", test$description)
-
-
-#Mala escriura de baño (bao / bano)
-
-test$description <- gsub("bao","baño", test$description)
-test$description <- gsub("bano","baño", test$description)
-
+if (is.na(df$bathrooms)==F){
+  df$new_bano=df$bathrooms
+}
 
 
 #Baño
