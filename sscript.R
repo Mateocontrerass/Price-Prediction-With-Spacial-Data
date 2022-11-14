@@ -761,7 +761,8 @@ words <- c("apartamento", "parqueadero", "lavanderia", "terraza",
 
 db_recipe <- recipe(formula=price ~ . , data=df) %>% ## En recip se detallan los pasos que se aplicarán a un conjunto de datos para prepararlo para el análisis de datos.
   update_role(property_id, new_role = "id") %>% ## cambiar role para variable id
-  step_regex(description, pattern=words , result="high_price_words") %>% ## generar dummy
+  step_regex(description, pattern = c("apartamento", "parqueadero", "lavanderia", "terraza",
+                                      "remodelada", "ascensor", "vigilancia", "iluminacion", "piscina")   , result="") %>% ## generar dummy
   step_rm(description) %>% ## remover description 
   step_dummy(all_nominal_predictors()) %>%
   step_nzv(all_predictors())
@@ -775,7 +776,7 @@ db_recipe
 #Este me cuenta cada vez que haya una palabra de baño solita
 df$bano <- str_count(string=df$description , pattern = "bano" )  
 
-if (df$bathrooms==NA){
+if (is.na(df$bathrooms==T)){
   df$bathrooms=df$bano
 }
 
