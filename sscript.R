@@ -788,6 +788,14 @@ table(is.na(train$bathrooms))
 
 train <- subset(train, select = -c(surface_covered, bedrooms, nuevos_banos, hab, bano))
 
+train$surface_total <- as.numeric(train$surface_total)
+
+train$geometry<-0
+
+train <- subset(train, select = -c(geometry))
+
+class(train$surface_total)
+
 ### Palabras con más incidencia
 
 bg_train <- train %>%
@@ -797,7 +805,7 @@ bg_train <- train %>%
 
 bg_train %>% count(word, sort = TRUE) %>% print(n=100)
 
-top_words_train <- bg %>%
+top_words_train <- bg_train %>%
   count(word, sort = TRUE) %>%
   filter(!word %in% as.character(0:10)) %>%
   slice_max(n, n = 100) %>%
@@ -835,17 +843,14 @@ evaluating_set <- st_drop_geometry(evaluating_set)
 ## recipe para trainning
 
 train_recipe <- recipe(formula=price ~ . , data=training_set) %>% ## En recip se detallan los pasos que se aplicarán a un conjunto de datos para prepararlo para el análisis de datos.
-  update_role(property_id, new_role = "property_id") %>% ## cambiar role para variable id
+  update_role(property_id, new_role = "property_id") %>% 
   step_regex(description, pattern = words, result="dummy") %>% ## generar dummy
-  step_rm(description, operation_type) %>%
+  step_rm(description, operation_type, title) %>%
   step_dummy(city, property_type) %>%
   step_nzv(all_predictors())
 train_recipe
 
 rm(bg_train)
-
-
-
 
 
 #-------------------------------------------------------------------------------
@@ -1038,79 +1043,87 @@ test <- st_drop_geometry(test)
 
 #-------------------------------------------------------------------------------
 
-
-# Preparación de la base para el modelo
-
-
-train <- subset(train,select=-c(geometry,description,title))
-test <- subset(test,select=-c(geometry,description,title))
-
-#train <- select(train,-geometry)
-#test  <- select(test,-geometry)
-
-#Dejar geometria
-train_f <- st_drop_geometry(train)
-test_f <- st_drop_geometry(test)
-
-train$property_type <- as.factor(train$property_type)
-train$city          <- as.factor(train$city) 
-test$property_type  <- as.factor(test$property_type)
-test$city           <- as.factor(test$city) 
-
-
-
-# % de cada ciudad
-prop.table(table(train$city))
-
-library(rsample)
-
-split<-rsample::initial_split(train,prop=0.2,strata=city)
-
-training_set<-rsample::training(split)
-testing_set<-rsample::testing(split)
-
-prop.table(table(training_set$city))
-
-install.packages("data.table")
-library(data.table)
-
-setDT(training_set)
-setDT(testing_set)
-
-
-#NA
-
-table(is.na(training_set))
-sapply(training_set, function(x) sum(is.na(x))/length(x))*100
-
-table(is.na(testing_set))
-sapply(testing_set, function(x) sum(is.na(x))/length(x))*100
-
-
-#codificacion
-
-
-
-new_tr<-one_hot(as.data.table(training_set))
-new_ts<-one_hot(as.data.table(testing_set))
-
-new_tr<-as.matrix(new_tr)
-new_ts<-as.matrix(new_ts)
-
-
-output<-training_set$price
-output_test<-testing_set$price
-
-
-dtrain <- xgb.DMatrix(data=new_tr, label=output)
-dtest <- xgb.DMatrix(data=new_ts, label=output_test)
-
-
-
-
-#------------------------------------------------------------------------------
-
 # XGBoost
+
+## set n-folds
+set.seed(234)
+db_folds <- vfold_cv(data=training_set, v=5 , strata=price)
+db_folds
+
+## set metrics
+db_metrics <- metric_set(yardstick::rmse, yardstick::rsq, ccc) ## para categoricas, la última es la función de perdida. RMSE para regresion
+
+## Boosted Tree Model Specification
+xgb_spec <- boost_tree(trees = 1000,
+                       tree_depth = tune(),
+                       min_n = tune(),
+                       mtry = tune(),
+                       sample_size = tune(),
+                       learn_rate = tune()) %>%
+  set_engine("xgboost") %>%
+  set_mode("regression") ## para regresión cambiar classification por regress
+xgb_spec
+
+## workflow
+xgb_word_wf <- workflow(train_recipe, xgb_spec)
+
+## tunne hiperparametros
+xgb_grid <- grid_max_entropy(tree_depth(c(5L, 10L)),
+                             min_n(c(10L, 40L)),
+                             mtry(c(5L, 10L)), 
+                             sample_prop(c(0.5, 1.0)), 
+                             learn_rate(c(-2, -1)),
+                             size = 20)
+xgb_grid
+
+## estimate model
+xgb_word_rs <- tune_race_anova(object = xgb_word_wf,
+                               resamples = db_folds,
+                               grid = xgb_grid,
+                               metrics = db_metrics,
+                               control = control_race(verbose_elim = T))
+xgb_word_rs
+
+##=== **3. Desempeño del modelo** ===##
+
+## plot model
+plot_race(xgb_word_rs)
+
+## best model
+show_best(xgb_word_rs)
+
+## xgboost model
+xgb_last <- xgb_word_wf %>%
+  finalize_workflow(select_best(xgb_word_rs, "mn_log_loss")) %>%
+  last_fit(db_split)
+xgb_last
+
+## min log loss
+collect_predictions(xgb_last) %>%
+  mn_log_loss(price, `.pred_17.8`:`.pred_3000`)
+
+## predictons vs truht value
+predictions <- collect_predictions(xgb_last) %>%
+  conf_mat(price, .pred_class)
+predictions
+
+predictions %>%
+  autoplot() + theme_light()
+
+## ROC curve
+collect_predictions(xgb_last) %>%
+  roc_curve(price, `.pred_17.8`:`.pred_3000`) %>%
+  ggplot(aes(1 - specificity, sensitivity, color = .level)) +
+  geom_abline(lty = 2, color = "gray80", size = 1.5) +
+  geom_path(alpha = 0.8, size = 1.2) +
+  coord_equal() + theme_light()
+
+## Var importance
+extract_workflow(xgb_last) %>%
+  extract_fit_parsnip() %>%
+  vip(geom = "point", num_features = 15) + theme_light()
+
+
 
 
 #Haré la prueba con una base mucho más pequeña
