@@ -684,14 +684,25 @@ bogota<-read.csv2("house_bogota.csv", sep=";", header = T) %>%
   select(-X) %>% mutate(description=str_to_lower(description),
                         description=stri_trans_general(str = description, id = "Latin-ASCII"))
 
-bogota %>% count(price)
+#bogota %>% count(price)
+
+bogota$description <- gsub("\n", " ", bogota$description)
+bogota$description <- gsub("<", " ", bogota$description)
+bogota$description <- gsub(">", " ", bogota$description)
+bogota$description <- gsub("br", " ", bogota$description)
+bogota$description <- gsub("&", " ", bogota$description)
+bogota$description <- gsub("tilde", " ", bogota$description)
+bogota$description <- gsub("/", " ", bogota$description)
+bogota$description <- gsub(" n ", " ", bogota$description)
+bogota$description <- gsub(" av ", " ", bogota$description)
+bogota$description <- gsub(";", " ", bogota$description)
 
 bogota$description <- gsub("nuevo", "remodelada", bogota$description)
 bogota$description <- gsub("nueva", "remodelada", bogota$description)
 bogota$description <- gsub("remodelado", "remodelada", bogota$description)
 bogota$description <- gsub("estrenar", "remodelada", bogota$description)
 bogota$description <- gsub("construida", "remodelada", bogota$description)
-bogota$description <- gsub("modelada", "remodelada", bogota$description)
+bogota$description <- gsub("re modelada", "remodelada", bogota$description)
 
 bogota$description <- gsub("bao","bano", bogota$description)
 bogota$description <- gsub("baño","bano", bogota$description)
@@ -717,8 +728,7 @@ bogota$description <- gsub("terrazas", "terraza", bogota$description)
 bogota$description <- gsub("mts2","m2", bogota$description)
 bogota$description <- gsub("cuadrados","m2", bogota$description)
 bogota$description <- gsub("mt2", "m2", bogota$description)
-
-bogota$description <- gsub("metros","mts", bogota$description)
+bogota$description <- gsub("metros","m2", bogota$description)
 
 bogota$description <- gsub("ascensores", "ascensor", bogota$description)
 
@@ -726,19 +736,24 @@ bogota$description <- gsub("ropas","lavanderia", bogota$description)
 bogota$description <- gsub("lavandera","lavanderia", bogota$description)
 bogota$description <- gsub("lavado", "lavanderia", bogota$description)
 
+bogota$description <- gsub("tres","3",bogota$description)
+bogota$description <- gsub("cinco","5",bogota$description)
+bogota$description <- gsub("dos","2",bogota$description)
+bogota$description <- gsub("doss","2",bogota$description)
+bogota$description <- gsub("cuatro","4",bogota$description)
+bogota$description <- gsub("cuastro","4",bogota$description)
+bogota$description <- gsub("seis","6",bogota$description)
+bogota$description <- gsub("doas","2",bogota$description)
 
-bg_1 <- bogota %>%
+bg <- bogota %>%
   unnest_tokens(output = word, input = description) %>% 
   anti_join(get_stopwords("es"), "word")
 
-bg %>% count(word, sort = TRUE) %>% tail(100)
 
+bg %>% count(word, sort = TRUE) %>% head(100)
+bg %>% count(price, word) %>% head(20)
 
-
-bg_1 %>% count(price, word) %>% head(20)
-bg_1 %>% count(word, sort = T) %>% head(20)
-
-top_words <- bg_1 %>%
+top_words <- bg %>%
   count(word, sort = TRUE) %>%
   filter(!word %in% as.character(0:10)) %>%
   slice_max(n, n = 100) %>%
@@ -746,11 +761,55 @@ top_words <- bg_1 %>%
 
 top_words  
 
-subset(bogota,property_id=="4f9c293c90181d1fb5850094")$description
+subset(bogota,property_id=="01d81171cd561cd2923b018e")$description
 
-x<- bg[bg$word=="dos",]
+x<- bg[bg$word=="br",]
+
+## contar conmibanciones de word y price
+
+count_words <- bg %>%
+  count(word, price) %>%
+  complete(word, price, fill = list(n = 0)) ## expandir todas las posibles combinaciones
+count_words %>% head(20)
+
+bg %>% count(word, price, sort = T) %>% head(20)
+
+word_freqs <- count_words %>%
+  group_by(price) %>%
+  mutate(price_sum = sum(n),
+         proportion = n / price_sum) %>%
+  ungroup() %>%
+  filter(word %in% top_words)
+word_freqs
+
+word_model <- word_freqs %>%
+  nest(data = c(price, n, price_sum, proportion)) %>%
+  mutate(model = map(.x = data,
+                     .f = ~ glm(cbind(n, price_sum) ~ price , data = . , family = "binomial")),
+         model = map(model, tidy)) %>%
+  unnest(model) %>%
+  filter(term == "price") %>%
+  mutate(p.value = p.adjust(p.value)) %>%
+  arrange(-estimate)
+word_model
+
+word_model %>%
+  ggplot(aes(x=estimate, y=p.value)) +
+  geom_vline(xintercept = 0, lty = 2, alpha = 0.7, color = "gray50") +
+  geom_point(color = "midnightblue", alpha = 0.8, size = 2.5) +
+  scale_y_log10() +
+  geom_text_repel(aes(label = word))
 
 
+higher_words <- word_model %>%
+  filter(p.value < 0.05) %>%
+  slice_max(estimate, n = 12) %>%
+  pull(word)
+
+lower_words <- word_model %>%
+  filter(p.value < 0.05) %>%
+  slice_max(-estimate, n = 12) %>%
+  pull(word)
 
 
 
