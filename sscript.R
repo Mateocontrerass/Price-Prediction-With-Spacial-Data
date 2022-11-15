@@ -1066,6 +1066,13 @@ evaluating_set <- readRDS("evaluating_set.rds")
 test <- readRDS("test_1.rds")
 xgb_word_rs <- readRDS("data/xgb_word_rs.rsd")
 
+c1<- c(names(test))
+c2<- c(names(training_set))
+
+ct <- intersect(c1,c2)
+
+training_set<-subset(train,select=c(ct))
+test<-subset(test,select=c(ct))
 
 # XGBoost
 
@@ -1125,12 +1132,13 @@ xgb_last <- xgb_word_wf %>%
   last_fit(split)
 xgb_last
 
-## min log loss
-collect_predictions(xgb_last) 
+## predictons vs truht value
+predictions <- collect_predictions(xgb_last) %>%
+  conf_mat(price, .pred)
+predictions
 
-%>%
-  mn_log_loss(price, `.pred_17.8`:`.pred_3000`)
-
+predictions %>%
+  autoplot() + theme_light()
 
 ## predecir :)
 
@@ -1139,22 +1147,17 @@ xgb_word_wf_test <- workflow(test_recipe, xgb_spec)
 xgb_last_test <- xgb_word_wf_test %>%
   finalize_workflow(select_best(xgb_word_rs, "rmse")) %>%
   last_fit(split)
-xgb_last
+xgb_last_test
 
-predicciones <- predict(xgb_last, test)
-
-
-test_prediction <- xgb_last %>%
-  predict(new_data = test)
-
-
-## predictons vs truht value
-predictions <- collect_predictions(xgb_last) %>%
-  conf_mat(price, .pred_class)
+predictions_test <- collect_predictions(xgb_last_test)%>%
+  conf_mat(price, .pred)
 predictions
 
 predictions %>%
   autoplot() + theme_light()
+
+
+
 
 ## ROC curve
 collect_predictions(xgb_last) %>%
