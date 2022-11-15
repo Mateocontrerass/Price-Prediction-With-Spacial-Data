@@ -852,7 +852,6 @@ train_recipe
 
 rm(bg_train)
 
-
 #-------------------------------------------------------------------------------
 
 ####Regex test
@@ -1036,12 +1035,37 @@ for (i in 1:5000){
 
 table(is.na(test$bathrooms))
 
-test <- subset(test, select = -c(surface_covered, bedrooms, nuevos_banos, hab, bano, dist_education))
+test <- subset(test, select = -c(surface_covered, bedrooms, nuevos_banos, hab, bano))
 
 #Dejar geometria
 test <- st_drop_geometry(test)
 
+test$geometry<-0
+
+test <- subset(test, select = -c(geometry))
+
+test$surface_total<-(as.numeric(test$surface_total))
+class(test$surface_total)
+
+
+test_recipe <- recipe(formula=price ~ . , data=test) %>% ## En recip se detallan los pasos que se aplicarán a un conjunto de datos para prepararlo para el análisis de datos.
+  update_role(property_id, new_role = "property_id") %>% 
+  step_regex(description, pattern = words, result="dummy") %>% ## generar dummy
+  step_rm(description, operation_type, title) %>%
+  step_dummy(city, property_type) %>%
+  step_nzv(all_predictors())
+test_recipe
+
+
 #-------------------------------------------------------------------------------
+
+train <- readRDS("train_1.rds")
+train_recipe <- readRDS("train_recip.rds")
+training_set <- readRDS("training_set.rds")
+evaluating_set <- readRDS("evaluating_set.rds")
+test <- readRDS("test_1.rds")
+xgb_word_rs <- readRDS("data/xgb_word_rs.rsd")
+
 
 # XGBoost
 
@@ -1077,12 +1101,15 @@ xgb_grid <- grid_max_entropy(tree_depth(c(5L, 10L)),
 xgb_grid
 
 ## estimate model
+tic()
 xgb_word_rs <- tune_race_anova(object = xgb_word_wf,
                                resamples = db_folds,
                                grid = xgb_grid,
                                metrics = db_metrics,
                                control = control_race(verbose_elim = T))
-xgb_word_rs
+toc()
+
+saveRDS(xgb_word_rs, file = "data/xgb_word_rs.rds")
 
 ##=== **3. Desempeño del modelo** ===##
 
@@ -1094,13 +1121,32 @@ show_best(xgb_word_rs)
 
 ## xgboost model
 xgb_last <- xgb_word_wf %>%
-  finalize_workflow(select_best(xgb_word_rs, "mn_log_loss")) %>%
-  last_fit(db_split)
+  finalize_workflow(select_best(xgb_word_rs, "rmse")) %>%
+  last_fit(split)
 xgb_last
 
 ## min log loss
-collect_predictions(xgb_last) %>%
+collect_predictions(xgb_last) 
+
+%>%
   mn_log_loss(price, `.pred_17.8`:`.pred_3000`)
+
+
+## predecir :)
+
+xgb_word_wf_test <- workflow(test_recipe, xgb_spec)
+
+xgb_last_test <- xgb_word_wf_test %>%
+  finalize_workflow(select_best(xgb_word_rs, "rmse")) %>%
+  last_fit(split)
+xgb_last
+
+predicciones <- predict(xgb_last, test)
+
+
+test_prediction <- xgb_last %>%
+  predict(new_data = test)
+
 
 ## predictons vs truht value
 predictions <- collect_predictions(xgb_last) %>%
@@ -1125,61 +1171,17 @@ extract_workflow(xgb_last) %>%
 
 
 
-
-#Haré la prueba con una base mucho más pequeña
-
-#Default parametros
-
-set.seed(999)
-params <- list(booster = "gbtree",
-               eta=0.3, gamma=0, max_depth=6, min_child_weight=1,
-               subsample=1, colsample_bytree=1)
-
-#Pa saber # arboles
-xgbcv <- xgb.cv(params = params, data = dtrain , nrounds = 500, nfold = 5,
-                showsd = T, stratified = T, print_every_n = 10, early_stop_round = 20,
-                maximize = F)
+test_prediction <- xgb_last %>%
+  # fit the model on all the training data
+  fit(
+    formula = price ~ ., 
+    data    = train_processed
+  ) %>%
+  # use the training model fit to predict the test data
+  predict(new_data = test_processed) %>%
+  bind_cols(testing(ames_split))
 
 
-elog <- as.data.frame(xgbcv$evaluation_log)
-
-#arboles recomendados
-
-(nrounds<-which.min(elog$test_rmse_mean))
-
-model <- xgboost(data=dtrain,label=output,
-                 nrounds=nrounds,
-                 params = params)
-
-pred <- predict(model,dtest)
-
-
-library(MLmetrics)
-
-RMSE(pred,testing_set$price)
-
-#------------------------------------------------------------------------------
-
-#Ahora tunear parametros
-
-lrn <- makeLearner("regr.xgboost")
-
-
-df_train<-as.data.frame(new_tr)
-
-colnames(df_train)[1]<-"Bogota"
-colnames(df_train)[2]<-"Medellin"
-
-
-traintask<-makeRegrTask(data=df_train,target="price")
-
-
-lrn$par.vals <- list(objective="reg:linear",nrounds=100L, eta=0.1 )
-
-params <- makeParamSet()
-
-
-colnames(df_train) <- make.names(colnames(df_train),unique = T)
 
 
 
