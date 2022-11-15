@@ -1064,7 +1064,7 @@ train_recipe <- readRDS("train_recip.rds")
 training_set <- readRDS("training_set.rds")
 evaluating_set <- readRDS("evaluating_set.rds")
 test <- readRDS("test_1.rds")
-xgb_word_rs <- readRDS("data/xgb_word_rs.rsd")
+xgb_word_rs <- readRDS("data/xgb_word_rs.rds")
 
 c1<- c(names(test))
 c2<- c(names(training_set))
@@ -1128,14 +1128,20 @@ show_best(xgb_word_rs)
 
 ## xgboost model
 xgb_last <- xgb_word_wf %>%
-  finalize_workflow(select_best(xgb_word_rs, "rmse")) %>%
-  last_fit(split)
+  finalize_workflow(select_best(xgb_word_rs, "rmse")) 
+
 xgb_last
 
+<<<<<<< Updated upstream
 ## predictons vs truht value
 predictions <- collect_predictions(xgb_last) %>%
   conf_mat(price, .pred)
 predictions
+=======
+## min log loss
+collect_predictions(xgb_last) 
+
+>>>>>>> Stashed changes
 
 predictions %>%
   autoplot() + theme_light()
@@ -1144,10 +1150,17 @@ predictions %>%
 
 xgb_word_wf_test <- workflow(test_recipe, xgb_spec)
 
+<<<<<<< Updated upstream
 xgb_last_test <- xgb_word_wf_test %>%
   finalize_workflow(select_best(xgb_word_rs, "rmse")) %>%
   last_fit(split)
 xgb_last_test
+=======
+# xgb_last_test <- xgb_word_wf_test %>%
+#   finalize_workflow(select_best(xgb_word_rs, "rmse")) %>%
+#   last_fit(split)
+# xgb_last
+>>>>>>> Stashed changes
 
 predictions_test <- collect_predictions(xgb_last_test)
 predictions_t <- subset(predictions_test, select = c("price", ".pred"))
@@ -1222,5 +1235,126 @@ params <- makeParamSet()
 
 
 
+#------------------------------------------------------------------------------
+
+-# Preparación de la base para el modelo
+  
+  
+train_xg <- subset(train,select=-c(property_id,description,title,operation_type,city))
+test_xg  <- subset(test,select=-c(property_id,description,title,operation_type,city))
+
+
+train_xg$property_type <- as.factor(train_xg$property_type)
+test_xg$property_type  <- as.factor(test_xg$property_type)
+
+
+
+
+library(rsample)
+
+split<-rsample::initial_split(train_xg,prop=0.8)
+
+training_set<-rsample::training(split)
+evaluating_set<-rsample::testing(split)
+
+
+#install.packages("data.table")
+library(data.table)
+
+setDT(training_set)
+setDT(evaluating_set)
+
+
+
+
+#codificacion
+
+
+
+new_tr<-one_hot(as.data.table(training_set))
+new_ts<-one_hot(as.data.table(evaluating_set))
+
+test_xg<-one_hot(as.data.table(test_xg))
+
+new_tr<-as.matrix(new_tr)
+new_ts<-as.matrix(new_ts)
+new_tcali<-as.matrix(test_xg)
+
+
+output<-training_set$price
+output_test<-evaluating_set$price
+
+
+dtrain <- xgb.DMatrix(data=new_tr, label=output)
+dtest <- xgb.DMatrix(data=new_ts, label=output_test)
+# XGBoost
+
+
+
+#Default parametros
+
+set.seed(999)
+params <- list(booster = "gbtree",
+               eta=0.3, gamma=0, max_depth=6, min_child_weight=1,
+               subsample=1, colsample_bytree=1)
+
+#Pa saber # arboles
+xgbcv <- xgb.cv(params = params, data = dtrain , nrounds = 2000, nfold = 5,
+                showsd = T, stratified = T, print_every_n = 10, early_stop_round = 20,
+                maximize = F)
+
+
+elog <- as.data.frame(xgbcv$evaluation_log)
+
+#arboles recomendados
+
+(nrounds<-which.min(elog$test_rmse_mean))
+
+model <- xgboost(data=dtrain,label=output,
+                 nrounds=nrounds,
+                 params = params)
+
+pred <- predict(model,dtest)
+
+
+library(MLmetrics)
+
+RMSE(pred,evaluating_set$price)
+
+#------------------------------------------------------------------------------
+
+#Ahora tunear parametros
+
+lrn <- makeLearner("regr.xgboost")
+
+
+df_train<-as.data.frame(new_tr)
+df_eval<-as.data.frame(new_ts)
+df_test<-as.data.frame(new_tcali)
+
+
+traintask<-makeRegrTask(data=df_train,target="price")
+testtask <-makeRegrTask(data=df_eval,target="price")
+
+
+
+#lrn$par.vals <- list(objective="reg:linear",nrounds=100L, eta=0.1 )
+
+params <- makeParamSet( makeDiscreteParam("booster",values = c("gbtree","gblinear")),
+                        makeIntegerParam("max_depth",lower = 3L,upper = 10L), makeNumericParam("min_child_weight",lower = 1L,upper = 10L),
+                        makeNumericParam("subsample",lower = 0.5,upper = 1), makeNumericParam("colsample_bytree",lower = 0.5,upper = 1))
+
+colnames(df_train) <- make.names(colnames(df_train),unique = T)
+
+rdesc <- makeResampleDesc("CV",stratify = T,iters=5L)
+ctrl <- makeTuneControlRandom(maxit = 10L)
+
+mytune <- tuneParams(learner = lrn, task = traintask, resampling = rdesc,
+                     measures = acc, par.set = params, control = ctrl, show.info = T)
+
+lrn_tune <- setHyperPars(lrn,par.vals = mytune$x)
+xgmodel <- train(learner = lrn_tune,task = traintask)
+
+xgpred <- predict(xgmodel,testtask)
 
 
