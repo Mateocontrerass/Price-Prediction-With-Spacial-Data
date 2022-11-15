@@ -1059,13 +1059,6 @@ test_recipe
 
 #-------------------------------------------------------------------------------
 
-train <- readRDS("train_1.rds")
-train_recipe <- readRDS("train_recip.rds")
-training_set <- readRDS("training_set.rds")
-evaluating_set <- readRDS("evaluating_set.rds")
-test <- readRDS("test_1.rds")
-xgb_word_rs <- readRDS("data/xgb_word_rs.rds")
-
 c1<- c(names(test))
 c2<- c(names(training_set))
 
