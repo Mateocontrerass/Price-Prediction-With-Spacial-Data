@@ -1149,43 +1149,74 @@ xgb_last_test <- xgb_word_wf_test %>%
   last_fit(split)
 xgb_last_test
 
-predictions_test <- collect_predictions(xgb_last_test)%>%
-  conf_mat(price, .pred)
-predictions
+predictions_test <- collect_predictions(xgb_last_test)
+predictions_t <- subset(predictions_test, select = c("price", ".pred"))
 
-predictions %>%
-  autoplot() + theme_light()
+pred <- predictions_test[1:5000,]
 
+id <- test$property_id
 
+pred$property_id<-id
 
+pred <- subset(pred, select=c("property_id", ".pred"))
 
-## ROC curve
-collect_predictions(xgb_last) %>%
-  roc_curve(price, `.pred_17.8`:`.pred_3000`) %>%
-  ggplot(aes(1 - specificity, sensitivity, color = .level)) +
-  geom_abline(lty = 2, color = "gray80", size = 1.5) +
-  geom_path(alpha = 0.8, size = 1.2) +
-  coord_equal() + theme_light()
+colnames(pred)[2]="price"
 
-## Var importance
-extract_workflow(xgb_last) %>%
-  extract_fit_parsnip() %>%
-  vip(geom = "point", num_features = 15) + theme_light()
+write.csv(pred, file ="predictions_ayala_contreras_meneses.csv")
 
 
 
-test_prediction <- xgb_last %>%
-  # fit the model on all the training data
-  fit(
-    formula = price ~ ., 
-    data    = train_processed
-  ) %>%
-  # use the training model fit to predict the test data
-  predict(new_data = test_processed) %>%
-  bind_cols(testing(ames_split))
+#Haré la prueba con una base mucho más pequeña
+
+#Default parametros
+
+set.seed(999)
+params <- list(booster = "gbtree",
+               eta=0.3, gamma=0, max_depth=6, min_child_weight=1,
+               subsample=1, colsample_bytree=1)
+
+#Pa saber # arboles
+xgbcv <- xgb.cv(params = params, data = dtrain , nrounds = 500, nfold = 5,
+                showsd = T, stratified = T, print_every_n = 10, early_stop_round = 20,
+                maximize = F)
 
 
+elog <- as.data.frame(xgbcv$evaluation_log)
 
+#arboles recomendados
+
+(nrounds<-which.min(elog$test_rmse_mean))
+
+model <- xgboost(data=dtrain,label=output,
+                 nrounds=nrounds,
+                 params = params)
+
+pred <- predict(model,dtest)
+
+
+library(MLmetrics)
+
+RMSE(pred,testing_set$price)
+
+#------------------------------------------------------------------------------
+
+#Ahora tunear parametros
+
+lrn <- makeLearner("regr.xgboost")
+
+
+df_train<-as.data.frame(new_tr)
+
+colnames(df_train)[1]<-"Bogota"
+colnames(df_train)[2]<-"Medellin"
+
+
+traintask<-makeRegrTask(data=df_train,target="price")
+
+
+lrn$par.vals <- list(objective="reg:linear",nrounds=100L, eta=0.1 )
+
+params <- makeParamSet()
 
 
 
