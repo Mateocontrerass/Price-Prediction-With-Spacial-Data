@@ -51,5 +51,4 @@ Para replicar los resultados se sugiere clonar el repositorio entero a una carpe
 
 # Representación del equipo durante el desarrollo del proyecto.
 
-![alt text]
-
+![](https://github.com/Mateocontrerass/Price-Prediction-With-Spacial-Data/blob/main/burning-office-spongebob.gif)
